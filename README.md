@@ -132,7 +132,7 @@ Found a bug? Have a feature request?
 ## 📞 Contact
 
 - **Author**: @zerote (@zerote)
-- **Email**: dev@z9s.dev
+- **Email**: condezero@gmail.com
 
 ---
 
