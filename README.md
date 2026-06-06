@@ -1,8 +1,8 @@
-# KT9S - K9s + Ktop Unified CLI
+# z9s - K9s + Ktop Unified CLI
 
 > **A unified Kubernetes CLI tool combining the power of k9s (cluster management) and ktop (metrics visualization)**
 
-## 🚀 What is KT9S?
+## 🚀 What is z9s?
 
 **z9s** merges two powerful Kubernetes CLI tools into one seamless experience:
 
@@ -29,7 +29,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/z9s.git
+git clone https://github.com/zerote/z9s.git
 cd z9s
 
 # Build from source
@@ -87,7 +87,7 @@ go test ./...
 
 ## 📚 Documentation
 
-- **Architecture**: See `docs/ARCHITECTURE.md` (or `KT9S_ANALYSIS.md`)
+- **Architecture**: See `INTEGRATION_GUIDE.md` or `KT9S_ANALYSIS.md`
 - **Contributing**: See `CONTRIBUTING.md` (coming soon)
 - **Original Projects**:
   - [k9s](https://github.com/derailed/k9s)
@@ -115,8 +115,8 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 
 Found a bug? Have a feature request?
 
-- [Report an Issue](https://github.com/yourusername/z9s/issues)
-- [Start a Discussion](https://github.com/yourusername/z9s/discussions)
+- [Report an Issue](https://github.com/zerote/z9s/issues)
+- [Start a Discussion](https://github.com/zerote/z9s/discussions)
 
 ## 🎓 Roadmap
 
@@ -131,8 +131,8 @@ Found a bug? Have a feature request?
 
 ## 📞 Contact
 
-- **Author**: Your Name (@yourusername)
-- **Email**: your.email@example.com
+- **Author**: @zerote (@zerote)
+- **Email**: dev@z9s.dev
 
 ---
 
