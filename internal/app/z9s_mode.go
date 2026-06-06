@@ -15,8 +15,8 @@ import (
 	"github.com/yourusername/z9s/internal/shared"
 )
 
-// K9sMode implements a functional k9s-like interface with context and node viewing
-type K9sMode struct {
+// Z9sMode implements a functional z9s interface with context and node viewing
+type Z9sMode struct {
 	app            *tview.Application
 	logger         *slog.Logger
 	k8sClient      *shared.SharedK8sClient
@@ -31,16 +31,16 @@ type K9sMode struct {
 	currentContext string
 }
 
-// NewK9sMode creates a new k9s mode with real functionality
-func NewK9sMode(k8sClient *shared.SharedK8sClient, logger *slog.Logger) *K9sMode {
+// NewZ9sMode creates a new z9s mode with real functionality
+func NewZ9sMode(k8sClient *shared.SharedK8sClient, logger *slog.Logger) *Z9sMode {
 	app := tview.NewApplication()
 
-	k := &K9sMode{
+	k := &Z9sMode{
 		app:       app,
 		logger:    logger,
 		k8sClient: k8sClient,
 		paused:    false,
-		name:      "k9s",
+		name:      "z9s",
 	}
 
 	k.setupUI()
@@ -48,7 +48,7 @@ func NewK9sMode(k8sClient *shared.SharedK8sClient, logger *slog.Logger) *K9sMode
 }
 
 // setupUI initializes the user interface
-func (k *K9sMode) setupUI() {
+func (k *Z9sMode) setupUI() {
 	// Contexts list on the left
 	k.contextList = tview.NewList()
 	k.contextList.SetTitle("Contexts").SetBorder(true)
@@ -82,7 +82,7 @@ func (k *K9sMode) setupUI() {
 }
 
 // setupEventHandlers sets up keyboard and mouse handlers
-func (k *K9sMode) setupEventHandlers() {
+func (k *Z9sMode) setupEventHandlers() {
 	k.contextList.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyEnter:
@@ -115,7 +115,7 @@ func (k *K9sMode) setupEventHandlers() {
 }
 
 // refreshContexts loads and displays available Kubernetes contexts
-func (k *K9sMode) refreshContexts() {
+func (k *Z9sMode) refreshContexts() {
 	k.contextList.Clear()
 
 	// Load kubeconfig
@@ -152,7 +152,7 @@ func (k *K9sMode) refreshContexts() {
 }
 
 // refreshNodes loads and displays nodes for the current context
-func (k *K9sMode) refreshNodes() {
+func (k *Z9sMode) refreshNodes() {
 	k.nodeList.Clear()
 	k.nodeList.SetTitle(fmt.Sprintf("Nodes [%s]", k.currentContext))
 
@@ -185,7 +185,7 @@ func (k *K9sMode) refreshNodes() {
 }
 
 // switchContext switches to a different Kubernetes context
-func (k *K9sMode) switchContext(contextName string) {
+func (k *Z9sMode) switchContext(contextName string) {
 	k.logger.Info("Switching context", "context", contextName)
 
 	// Switch using kubectl
@@ -200,15 +200,15 @@ func (k *K9sMode) switchContext(contextName string) {
 	k.refreshContexts()
 }
 
-// Init initializes the k9s mode
-func (k *K9sMode) Init() error {
-	k.logger.Info("Initializing k9s mode")
+// Init initializes the z9s mode
+func (k *Z9sMode) Init() error {
+	k.logger.Info("Initializing z9s mode")
 	return nil
 }
 
-// Start starts the k9s mode main loop
-func (k *K9sMode) Start() error {
-	k.logger.Info("Starting k9s mode")
+// Start starts the z9s mode main loop
+func (k *Z9sMode) Start() error {
+	k.logger.Info("Starting z9s mode")
 	k.paused = false
 
 	if err := k.app.SetRoot(k.mainView, true).Run(); err != nil {
@@ -217,15 +217,15 @@ func (k *K9sMode) Start() error {
 	return nil
 }
 
-// Stop stops the k9s mode
-func (k *K9sMode) Stop() error {
-	k.logger.Info("Stopping k9s mode")
+// Stop stops the z9s mode
+func (k *Z9sMode) Stop() error {
+	k.logger.Info("Stopping z9s mode")
 	k.app.Stop()
 	return nil
 }
 
 // HandleEvent processes keyboard and mouse events
-func (k *K9sMode) HandleEvent(ev tcell.Event) bool {
+func (k *Z9sMode) HandleEvent(ev tcell.Event) bool {
 	if k.paused || k.app == nil {
 		return false
 	}
@@ -241,27 +241,27 @@ func (k *K9sMode) HandleEvent(ev tcell.Event) bool {
 	return false
 }
 
-// Pause pauses the k9s mode
-func (k *K9sMode) Pause() error {
-	k.logger.Info("Pausing k9s mode")
+// Pause pauses the z9s mode
+func (k *Z9sMode) Pause() error {
+	k.logger.Info("Pausing z9s mode")
 	k.paused = true
 	return nil
 }
 
-// Resume resumes the k9s mode
-func (k *K9sMode) Resume() error {
-	k.logger.Info("Resuming k9s mode")
+// Resume resumes the z9s mode
+func (k *Z9sMode) Resume() error {
+	k.logger.Info("Resuming z9s mode")
 	k.paused = false
 	return nil
 }
 
 // Name returns the name of this mode
-func (k *K9sMode) Name() string {
+func (k *Z9sMode) Name() string {
 	return k.name
 }
 
-// Draw renders the k9s UI
-func (k *K9sMode) Draw() error {
+// Draw renders the z9s UI
+func (k *Z9sMode) Draw() error {
 	if k.paused || k.app == nil {
 		return nil
 	}
