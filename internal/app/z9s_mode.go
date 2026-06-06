@@ -130,13 +130,15 @@ func (k *Z9sMode) refreshContexts() {
 
 	k.kubeconfig = &config
 
-	// Get current context
-	currentCtx, _ := kubeconfig.ClientConfig()
-	if currentCtx != nil {
-		if ns, _, err := currentCtx.Namespace(); err == nil {
-			k.logger.Info("Current context", "context", k.currentContext, "namespace", ns)
-		}
+	// Get current namespace
+	var currentNamespace string
+	if ns, _, err := kubeconfig.Namespace(); err == nil {
+		currentNamespace = ns
+	} else {
+		currentNamespace = "default"
 	}
+
+	k.logger.Info("Current context", "context", k.currentContext, "namespace", currentNamespace)
 
 	// Add all contexts
 	for name := range config.Contexts {
