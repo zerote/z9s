@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright Authors of z9s
 
-package k8s_client
+package shared
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
+	"os"
+	"os/exec"
 	"sync"
+	"time"
 
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -32,6 +38,9 @@ type SharedK8sClient struct {
 
 	// Logger
 	logger *slog.Logger
+
+	// Current context
+	currentContext string
 }
 
 var (
@@ -91,8 +100,15 @@ func (c *SharedK8sClient) Initialize(kubeconfig string) error {
 	}
 	c.metricsClientset = metricsClientset
 
+	// Get current context
+	rules := clientcmd.NewDefaultClientConfigLoadingRules()
+	kubeConfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(rules, &clientcmd.ConfigOverrides{}).ClientConfig()
+	if err == nil {
+		c.currentContext = kubeConfig.ClientConfig.CurrentContext
+	}
+
 	c.connected = true
-	c.logger.Info("Shared K8s client initialized successfully")
+	c.logger.Info("Shared K8s client initialized successfully", "context", c.currentContext)
 
 	return nil
 }
@@ -137,6 +153,88 @@ func (c *SharedK8sClient) CheckConnectivity() bool {
 	// Try to get server version
 	_, err := c.clientset.Discovery().ServerVersion()
 	return err == nil
+}
+
+// GetNodes retrieves all nodes from the cluster
+func (c *SharedK8sClient) GetNodes() (*v1.NodeList, error) {
+	c.mu.RLock()
+	clientset := c.clientset
+	c.mu.RUnlock()
+
+	if clientset == nil {
+		return nil, fmt.Errorf("not connected to cluster")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		c.logger.Error("Failed to get nodes", "error", err)
+		return nil, fmt.Errorf("failed to list nodes: %w", err)
+	}
+
+	return nodes, nil
+}
+
+// SwitchContext switches to a different Kubernetes context
+func (c *SharedK8sClient) SwitchContext(contextName string) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.logger.Info("Switching context", "context", contextName)
+
+	// Use kubectl to switch context
+	cmd := exec.Command("kubectl", "config", "use-context", contextName)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		c.logger.Error("Failed to switch context", "context", contextName, "error", err)
+		return fmt.Errorf("failed to switch context: %w", err)
+	}
+
+	c.currentContext = contextName
+
+	// Reinitialize the client with the new context
+	return c.reinitializeWithNewContext()
+}
+
+// reinitializeWithNewContext reinitializes the client after context switch
+func (c *SharedK8sClient) reinitializeWithNewContext() error {
+	// Load kubeconfig from default paths
+	config, err := clientcmd.BuildConfigFromFlags("", "")
+	if err != nil {
+		c.logger.Error("Failed to load kubeconfig after switch", "error", err)
+		return err
+	}
+
+	c.restConfig = config
+
+	// Create new clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		c.logger.Error("Failed to create clientset after switch", "error", err)
+		return err
+	}
+	c.clientset = clientset
+
+	// Create new metrics clientset
+	metricsClientset, err := metricsv.NewForConfig(config)
+	if err != nil {
+		c.logger.Warn("Failed to create metrics clientset after switch (optional)", "error", err)
+	}
+	c.metricsClientset = metricsClientset
+
+	c.logger.Info("Client reinitialized with new context", "context", c.currentContext)
+	return nil
+}
+
+// GetCurrentContext returns the current context
+func (c *SharedK8sClient) GetCurrentContext() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.currentContext
 }
 
 // Close closes the connection
