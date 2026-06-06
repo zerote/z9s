@@ -4,7 +4,6 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 
@@ -133,9 +132,11 @@ func (k *K9sMode) refreshContexts() {
 
 	// Get current context
 	currentCtx, _ := kubeconfig.ClientConfig()
-	ns, _ := currentCtx.Namespace()
-	k.currentContext = currentCtx.ClientConfig.CurrentContext
-	k.logger.Info("Current context", "context", k.currentContext, "namespace", ns)
+	if currentCtx != nil {
+		if ns, _, err := currentCtx.Namespace(); err == nil {
+			k.logger.Info("Current context", "context", k.currentContext, "namespace", ns)
+		}
+	}
 
 	// Add all contexts
 	for name := range config.Contexts {
