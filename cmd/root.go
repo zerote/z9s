@@ -105,7 +105,7 @@ func run(*cobra.Command, []string) error {
 	// Print welcome message
 	fmt.Println(`
 ╔════════════════════════════════════════════════════════════╗
-║                     KT9S - v0.0.1                         ║
+║                     z9s - v0.0.1                          ║
 ║         Unified Kubernetes CLI (k9s + ktop)              ║
 ╠════════════════════════════════════════════════════════════╣
 ║                                                            ║
@@ -114,15 +114,54 @@ func run(*cobra.Command, []string) error {
 ║    q         - Quit application                           ║
 ║    Ctrl+C    - Force quit                                 ║
 ║                                                            ║
-║  Status: 🟡 Skeleton complete, integration pending        ║
-║  Next: Wire up k9s and ktop actual apps                   ║
-║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
 `)
 
-	logger.Info("Skeleton ready - awaiting app integration")
+	// Initialize K8s client
+	logger.Info("Initializing Kubernetes client...")
+	k8sClient := app.GetSharedK8sClient(logger)
+	
+	kubeconfig := k8sFlags.KubeConfig
+	if kubeconfig == nil {
+		kubeconfig = new(string)
+	}
+	
+	if err := k8sClient.Initialize(*kubeconfig); err != nil {
+		logger.Error("Failed to initialize K8s client", "error", err)
+		// Continue anyway - might be offline mode
+	}
 
-	return nil
+	// Create Z9s mode
+	logger.Info("Creating z9s mode...")
+	z9sMode := app.NewZ9sMode(k8sClient, logger)
+
+	// Create ktop mode (stub for now)
+	logger.Info("Creating ktop mode...")
+	ktopMode := app.NewKtopMode(nil, logger) // TODO: implement ktop
+
+	// Create mode context
+	modeCtx := &app.ModeContext{
+		CurrentMode: app.ModeK9s,
+		RefreshRate: *k9sFlags.RefreshRate,
+	}
+
+	// Create app manager
+	logger.Info("Creating app manager...")
+	appManager, err := app.NewAppManager(z9sMode, ktopMode, modeCtx, logger)
+	if err != nil {
+		logger.Error("Failed to create app manager", "error", err)
+		return fmt.Errorf("failed to create app manager: %w", err)
+	}
+
+	// Initialize app manager
+	if err := appManager.Init(); err != nil {
+		logger.Error("Failed to initialize app manager", "error", err)
+		return fmt.Errorf("failed to initialize app manager: %w", err)
+	}
+
+	// Run the application
+	logger.Info("Starting main application loop...")
+	return appManager.Run()
 }
 
 // initializeLogger sets up the logger

@@ -32,22 +32,15 @@ func NewKtopMode(app *ktopapp.App, logger *slog.Logger) *KtopMode {
 // Init initializes the ktop mode
 func (k *KtopMode) Init() error {
 	k.logger.Info("Initializing ktop mode")
-
-	// The app should already be initialized by the caller
-	if k.app == nil {
-		return fmt.Errorf("ktop app is nil")
-	}
-
+	// ktop stub - app can be nil for now
 	return nil
 }
 
 // Start starts the ktop mode main loop
 func (k *KtopMode) Start() error {
-	k.logger.Info("Starting ktop mode")
-
-	// ktop should handle its own run loop
+	k.logger.Info("Starting ktop mode (stub)")
+	// Ktop stub - just log for now
 	k.paused = false
-
 	return nil
 }
 
