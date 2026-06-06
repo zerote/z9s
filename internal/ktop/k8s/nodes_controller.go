@@ -1,0 +1,119 @@
+package k8s
+
+import (
+	"context"
+	"time"
+
+	"github.com/yourusername/z9s/views/model"
+	coreV1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/labels"
+	metricsV1beta1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
+)
+
+func (c *Controller) GetNode(ctx context.Context, nodeName string) (*coreV1.Node, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	node, err := c.nodeInformer.Lister().Get(nodeName)
+	if err != nil {
+		return nil, err
+	}
+	// Return a deep copy to avoid pointer to informer cache issues
+	return node.DeepCopy(), nil
+}
+
+func (c *Controller) GetNodeList(ctx context.Context) ([]*coreV1.Node, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+
+	items, err := c.nodeInformer.Lister().List(labels.Everything())
+	if err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+func (c *Controller) GetNodeModels(ctx context.Context) (models []model.NodeModel, err error) {
+	nodes, err := c.GetNodeList(ctx)
+	if err != nil {
+		return
+	}
+
+	// map each node to their pods
+	pods, err := c.GetPodList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, node := range nodes {
+		metrics, err := c.GetNodeMetrics(ctx, node.Name)
+		if err != nil {
+			metrics = new(metricsV1beta1.NodeMetrics)
+		}
+		nodePods := getPodNodes(node.Name, pods)
+		podsCount := len(nodePods)
+		nodeModel := model.NewNodeModel(node, metrics)
+		nodeModel.PodsCount = podsCount
+		nodeModel.RequestedPodMemQty = resource.NewQuantity(0, resource.DecimalSI)
+		nodeModel.RequestedPodCpuQty = resource.NewQuantity(0, resource.DecimalSI)
+		for _, pod := range nodePods {
+			summary := model.GetPodContainerSummary(pod)
+			nodeModel.RequestedPodMemQty.Add(*summary.RequestedMemQty)
+			nodeModel.RequestedPodCpuQty.Add(*summary.RequestedCpuQty)
+			// Aggregate container restarts for this node
+			for _, cs := range pod.Status.ContainerStatuses {
+				nodeModel.Restarts += int(cs.RestartCount)
+			}
+		}
+
+		models = append(models, *nodeModel)
+	}
+	return
+}
+
+func (c *Controller) setupNodeHandler(ctx context.Context, handlerFunc RefreshNodesFunc) {
+	go func() {
+		c.refreshNodes(ctx, handlerFunc) // initial refresh
+		ticker := time.NewTicker(5 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				if err := c.refreshNodes(ctx, handlerFunc); err != nil {
+					continue
+				}
+			}
+		}
+	}()
+}
+
+func (c *Controller) refreshNodes(ctx context.Context, handlerFunc RefreshNodesFunc) error {
+	// Skip refresh if API is disconnected - don't update UI with stale cached data
+	if c.healthTracker != nil && c.healthTracker.IsDisconnected() {
+		return nil
+	}
+
+	models, err := c.GetNodeModels(ctx)
+	if err != nil {
+		c.reportError(err)
+		return err
+	}
+	c.reportSuccess()
+	handlerFunc(ctx, models)
+	return nil
+}
+
+func getPodNodes(nodeName string, pods []*coreV1.Pod) []*coreV1.Pod {
+	var result []*coreV1.Pod
+
+	for _, pod := range pods {
+		if pod.Spec.NodeName == nodeName {
+			result = append(result, pod)
+		}
+	}
+	return result
+}
