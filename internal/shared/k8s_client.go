@@ -100,11 +100,12 @@ func (c *SharedK8sClient) Initialize(kubeconfig string) error {
 	}
 	c.metricsClientset = metricsClientset
 
-	// Get current context
+	// Get current context from kubeconfig
 	rules := clientcmd.NewDefaultClientConfigLoadingRules()
-	kubeConfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(rules, &clientcmd.ConfigOverrides{}).ClientConfig()
-	if err == nil {
-		c.currentContext = kubeConfig.ClientConfig.CurrentContext
+	configLoader := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(rules, &clientcmd.ConfigOverrides{})
+	rawConfig, err := configLoader.RawConfig()
+	if err == nil && rawConfig.CurrentContext != "" {
+		c.currentContext = rawConfig.CurrentContext
 	}
 
 	c.connected = true
