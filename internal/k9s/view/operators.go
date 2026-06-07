@@ -147,33 +147,6 @@ func operatorsBody(flux, argo bool) string {
 // ----------------------------------------------------------------------------
 // FluxCD overview page.
 
-// NewFluxOverview returns the FluxCD overview page. Enabled commands live in the
-// header menu only (<o> Overview, <k> Kustomizations).
-func NewFluxOverview(app *App) *menuPage {
-	p := newMenuPage(app, "FluxCD")
-	p.actions.Bulk(ui.KeyMap{
-		ui.KeyK:         ui.NewKeyAction("Kustomizations", app.gotoFluxKustomizations, true),
-		tcell.KeyEscape: ui.NewKeyAction("Back", app.PrevCmd, false),
-		ui.KeyQ:         ui.NewKeyAction("Back", app.PrevCmd, false),
-	})
-	p.actions.Add(ui.KeyO, ui.NewKeyAction("Overview", func(*tcell.EventKey) *tcell.EventKey {
-		p.text.SetText(fluxOverviewBody())
-		return nil
-	}, true))
-	p.text.SetText(fluxOverviewBody())
-
-	return p
-}
-
-func fluxOverviewBody() string {
-	var b strings.Builder
-	fmt.Fprint(&b, "\n  [aqua::b]FluxCD Overview[-:-:-]\n\n")
-	fmt.Fprint(&b, "   GitOps reconciliation status for this cluster.\n\n")
-	fmt.Fprint(&b, "   [gray::-](overview metrics coming soon)[-:-:-]\n")
-
-	return b.String()
-}
-
 // ----------------------------------------------------------------------------
 // App navigation handlers.
 
