@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 
 	"github.com/adrg/xdg"
-	"github.com/yourusername/z9s/internal/config/data"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/config/data"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 )
 
 const (

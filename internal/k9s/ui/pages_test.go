@@ -6,7 +6,7 @@ package ui_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/ui"
+	"github.com/yourusername/z9s/internal/k9s/ui"
 	"github.com/stretchr/testify/assert"
 )
 

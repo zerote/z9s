@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright Authors of z9s
+// Copyright Authors of K9s
 
 package main
 

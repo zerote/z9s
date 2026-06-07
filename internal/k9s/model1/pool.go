@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 )
 
 type jobFn func(ctx context.Context) error

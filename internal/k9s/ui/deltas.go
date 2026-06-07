@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/z9s/internal/render"
+	"github.com/yourusername/z9s/internal/k9s/render"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 

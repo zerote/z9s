@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yourusername/z9s/internal/tchart"
+	"github.com/yourusername/z9s/internal/k9s/tchart"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -6,9 +6,9 @@ package render_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/model1"
-	"github.com/yourusername/z9s/internal/render"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/model1"
+	"github.com/yourusername/z9s/internal/k9s/render"
 	"github.com/derailed/tcell/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

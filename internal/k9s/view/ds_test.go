@@ -6,8 +6,8 @@ package view_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/view"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/view"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

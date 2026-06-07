@@ -6,7 +6,7 @@ package model1_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/model1"
+	"github.com/yourusername/z9s/internal/k9s/model1"
 	"github.com/stretchr/testify/assert"
 )
 

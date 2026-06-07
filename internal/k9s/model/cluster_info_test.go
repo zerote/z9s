@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/model"
+	"github.com/yourusername/z9s/internal/k9s/model"
 	"github.com/stretchr/testify/assert"
 )
 

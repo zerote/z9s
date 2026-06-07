@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/yourusername/z9s/internal/dao"
-	"github.com/yourusername/z9s/internal/ui"
+	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/yourusername/z9s/internal/k9s/ui"
 	"github.com/derailed/tview"
 )
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/config"
+	"github.com/yourusername/z9s/internal/k9s/config"
 	"github.com/derailed/tview"
 )
 
@@ -18,6 +18,7 @@ type Logo struct {
 
 	logo, status *tview.TextView
 	styles       *config.Styles
+	version      string
 	mx           sync.Mutex
 }
 
@@ -56,6 +57,7 @@ func (l *Logo) StylesChanged(s *config.Styles) {
 	l.status.SetBackgroundColor(l.styles.BgColor())
 	l.logo.SetBackgroundColor(l.styles.BgColor())
 	l.refreshLogo(l.styles.Body().LogoColor)
+	l.showVersion()
 }
 
 // IsBenchmarking checks if benchmarking is active or not.
@@ -64,10 +66,27 @@ func (l *Logo) IsBenchmarking() bool {
 	return strings.Contains(txt, "Bench")
 }
 
+// SetVersion pins the z9s version below the logo and keeps it across resets.
+func (l *Logo) SetVersion(v string) {
+	l.version = v
+	l.showVersion()
+}
+
+func (l *Logo) showVersion() {
+	if l.version == "" {
+		return
+	}
+	l.mx.Lock()
+	defer l.mx.Unlock()
+	l.status.SetBackgroundColor(l.styles.BgColor())
+	l.status.SetText("[white::b]" + l.version + " ⚡️")
+}
+
 // Reset clears out the logo view and resets colors.
 func (l *Logo) Reset() {
 	l.status.Clear()
 	l.StylesChanged(l.styles)
+	l.showVersion()
 }
 
 // Err displays a log error state.

@@ -8,15 +8,15 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/model"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/model"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 )
 
 const (
-	defaultPrompt = "%c%c [::b]%s"
-	defaultSpacer = 4
+	defaultPrompt = "%c %c [::b]%s"
+	defaultSpacer = 5
 )
 
 var (

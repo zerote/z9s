@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/dao"
-	"github.com/yourusername/z9s/internal/health"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/yourusername/z9s/internal/k9s/health"
 )
 
 // PulseListener represents a health model listener.

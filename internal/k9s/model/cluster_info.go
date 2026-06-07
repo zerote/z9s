@@ -5,26 +5,11 @@ package model
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"io"
-	"log/slog"
-	"net/http"
 	"sync"
-	"time"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/dao"
-	"github.com/yourusername/z9s/internal/slogs"
-	"k8s.io/apimachinery/pkg/util/cache"
-)
-
-const (
-	k9sGitURL       = "https://api.github.com/repos/derailed/k9s/releases/latest"
-	cacheSize       = 10
-	cacheExpiry     = 1 * time.Hour
-	k9sLatestRevKey = "k9sRev"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/dao"
 )
 
 // ClusterInfoListener registers a listener for model changes.
@@ -40,7 +25,7 @@ type ClusterInfoListener interface {
 type ClusterMeta struct {
 	Context, Cluster    string
 	User                string
-	K9sVer, K9sLatest   string
+	Z9sVer, Z9sLatest   string
 	K8sVer              string
 	Cpu, Mem, Ephemeral int
 }
@@ -51,7 +36,7 @@ func NewClusterMeta() *ClusterMeta {
 		Context:   client.NA,
 		Cluster:   client.NA,
 		User:      client.NA,
-		K9sVer:    client.NA,
+		Z9sVer:    client.NA,
 		K8sVer:    client.NA,
 		Cpu:       0,
 		Mem:       0,
@@ -69,8 +54,8 @@ func (c *ClusterMeta) Deltas(n *ClusterMeta) bool {
 		c.Cluster != n.Cluster ||
 		c.User != n.User ||
 		c.K8sVer != n.K8sVer ||
-		c.K9sVer != n.K9sVer ||
-		c.K9sLatest != n.K9sLatest
+		c.Z9sVer != n.Z9sVer ||
+		c.Z9sLatest != n.Z9sLatest
 }
 
 // ClusterInfo models cluster metadata.
@@ -81,7 +66,6 @@ type ClusterInfo struct {
 	version   string
 	cfg       *config.K9s
 	listeners []ClusterInfoListener
-	cache     *cache.LRUExpireCache
 	mx        sync.RWMutex
 }
 
@@ -93,26 +77,9 @@ func NewClusterInfo(f dao.Factory, v string, cfg *config.K9s) *ClusterInfo {
 		data:    NewClusterMeta(),
 		version: v,
 		cfg:     cfg,
-		cache:   cache.NewLRUExpireCache(cacheSize),
 	}
 
 	return &c
-}
-
-func (c *ClusterInfo) fetchK9sLatestRev() string {
-	rev, ok := c.cache.Get(k9sLatestRevKey)
-	if ok {
-		return rev.(string)
-	}
-
-	latestRev, err := fetchLatestRev()
-	if err != nil {
-		slog.Warn("k9s latest rev fetch failed", slogs.Error, err)
-	} else {
-		c.cache.Add(k9sLatestRevKey, latestRev, cacheExpiry)
-	}
-
-	return latestRev
 }
 
 // Reset resets context and reload.
@@ -143,19 +110,12 @@ func (c *ClusterInfo) Refresh() {
 			data.Cpu, data.Mem, data.Ephemeral = mx.PercCPU, mx.PercMEM, mx.PercEphemeral
 		}
 	}
-	data.K9sVer = c.version
-	v1 := NewSemVer(data.K9sVer)
+	data.Z9sVer = c.version
+	v1 := NewSemVer(data.Z9sVer)
 
-	var latestRev string
-	if !c.cfg.SkipLatestRevCheck {
-		latestRev = c.fetchK9sLatestRev()
-	}
-	v2 := NewSemVer(latestRev)
-
-	data.K9sVer, data.K9sLatest = v1.String(), v2.String()
-	if v1.IsCurrent(v2) {
-		data.K9sLatest = ""
-	}
+	// z9s does not track k9s upstream releases, so we never advertise a "latest"
+	// revision. Only the z9s version is shown.
+	data.Z9sVer, data.Z9sLatest = v1.String(), ""
 
 	if c.data.Deltas(data) {
 		c.fireMetaChanged(c.data, data)
@@ -197,42 +157,4 @@ func (c *ClusterInfo) fireNoMetaChanged(data *ClusterMeta) {
 	for _, l := range c.listeners {
 		l.ClusterInfoUpdated(data)
 	}
-}
-
-// Helpers...
-
-func fetchLatestRev() (string, error) {
-	slog.Debug("Fetching latest k9s rev...")
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, k9sGitURL, http.NoBody)
-	if err != nil {
-		return "", err
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer func() {
-		if resp.Body != nil {
-			_ = resp.Body.Close()
-		}
-	}()
-
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	m := make(map[string]any, 20)
-	if err := json.Unmarshal(b, &m); err != nil {
-		return "", err
-	}
-
-	if v, ok := m["name"]; ok {
-		slog.Debug("K9s latest rev", slogs.Revision, v.(string))
-		return v.(string), nil
-	}
-
-	return "", errors.New("no version found")
 }

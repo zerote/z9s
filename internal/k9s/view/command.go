@@ -12,11 +12,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/dao"
-	"github.com/yourusername/z9s/internal/model"
-	"github.com/yourusername/z9s/internal/slogs"
-	"github.com/yourusername/z9s/internal/view/cmd"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/yourusername/z9s/internal/k9s/model"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/yourusername/z9s/internal/k9s/view/cmd"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -269,6 +269,8 @@ func (c *Command) defaultCmd(isRoot bool) error {
 
 func (c *Command) specialCmd(p *cmd.Interpreter, pushCmd bool) bool {
 	switch {
+	case p.Cmd() == "metrics":
+		c.app.showZ9sTop()
 	case p.IsCowCmd():
 		if msg, ok := p.CowArg(); !ok {
 			c.app.Flash().Errf("Invalid command. Use `cow xxx`")

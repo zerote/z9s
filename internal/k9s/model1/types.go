@@ -6,7 +6,7 @@ package model1
 import (
 	"context"
 
-	"github.com/yourusername/z9s/internal/config"
+	"github.com/yourusername/z9s/internal/k9s/config"
 	"github.com/derailed/tcell/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

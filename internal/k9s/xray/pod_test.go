@@ -7,10 +7,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/render"
-	"github.com/yourusername/z9s/internal/xray"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/yourusername/z9s/internal/k9s/xray"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -6,8 +6,8 @@ package dao
 import (
 	"log/slog"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	"k8s.io/kubectl/pkg/describe"
 )
 

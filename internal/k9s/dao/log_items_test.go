@@ -8,8 +8,8 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/dao"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/dao"
 	"github.com/stretchr/testify/assert"
 )
 

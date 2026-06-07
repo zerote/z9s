@@ -10,9 +10,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	"k8s.io/apimachinery/pkg/labels"
 )
 

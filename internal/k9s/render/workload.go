@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/model1"
+	"github.com/yourusername/z9s/internal/k9s/model1"
 	"github.com/derailed/tcell/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

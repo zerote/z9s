@@ -3,7 +3,7 @@ package render
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/model1"
+	"github.com/yourusername/z9s/internal/k9s/model1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

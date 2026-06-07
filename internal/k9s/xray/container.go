@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/dao"
-	"github.com/yourusername/z9s/internal/render"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )

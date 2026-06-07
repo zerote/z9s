@@ -7,7 +7,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/port"
+	"github.com/yourusername/z9s/internal/k9s/port"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -6,7 +6,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/config"
+	"github.com/yourusername/z9s/internal/k9s/config"
 	"github.com/stretchr/testify/assert"
 )
 

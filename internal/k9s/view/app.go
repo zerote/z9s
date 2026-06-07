@@ -17,16 +17,16 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/model"
-	"github.com/yourusername/z9s/internal/slogs"
-	"github.com/yourusername/z9s/internal/ui"
-	"github.com/yourusername/z9s/internal/ui/dialog"
-	"github.com/yourusername/z9s/internal/view/cmd"
-	"github.com/yourusername/z9s/internal/vul"
-	"github.com/yourusername/z9s/internal/watch"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/model"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/yourusername/z9s/internal/k9s/ui/dialog"
+	"github.com/yourusername/z9s/internal/k9s/view/cmd"
+	"github.com/yourusername/z9s/internal/k9s/vul"
+	"github.com/yourusername/z9s/internal/k9s/watch"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 )
@@ -39,6 +39,12 @@ const (
 	clusterRefresh   = 15 * time.Second
 	clusterInfoWidth = 50
 	clusterInfoPad   = 15
+
+	// Page identifiers registered in a.Main.
+	mainPageID          = "main"
+	splashPageID        = "splash"
+	z9sTopPageID        = "z9stop"
+	z9sNodeDetailPageID = "z9snode"
 )
 
 // App represents an application view.
@@ -56,6 +62,11 @@ type App struct {
 	showHeader    bool
 	showLogo      bool
 	showCrumbs    bool
+	// splashReturn is the in-memory buffer that remembers which page was active
+	// before we toggled to the z9sTop dashboard (Ctrl+N), so we can return to it.
+	splashReturn string
+	// top is the lazily-created ktop-inspired dashboard shown via Ctrl+N.
+	top *Z9sTop
 }
 
 // NewApp returns a K9s app instance.
@@ -103,6 +114,7 @@ func (a *App) Init(version string, _ int) error {
 	a.Content.AddListener(a.Menu())
 
 	a.App.Init()
+	a.Logo().SetVersion(a.version)
 	a.SetInputCapture(a.keyboard)
 	a.bindKeys()
 
@@ -244,6 +256,20 @@ func (a *App) contextNames() ([]string, error) {
 }
 
 func (a *App) keyboard(evt *tcell.EventKey) *tcell.EventKey {
+	// When the z9sTop dashboard is in front, route keys to its own command
+	// prompt so ":" opens an inline input (and ESC/typing stay local to it).
+	if a.top != nil {
+		if name, _ := a.Main.GetFrontPage(); name == z9sTopPageID {
+			if a.top.promptOn {
+				return evt
+			}
+			if evt.Rune() == ':' {
+				a.top.showPrompt()
+				return nil
+			}
+		}
+	}
+
 	if k, ok := a.HasAction(ui.AsKey(evt)); ok && !a.Content.IsTopDialog() {
 		return k.Action(evt)
 	}
@@ -262,6 +288,7 @@ func (a *App) bindKeys() {
 		tcell.KeyCtrlA:     ui.NewSharedKeyAction("Aliases", a.aliasCmd, false),
 		tcell.KeyEnter:     ui.NewKeyAction("Goto", a.gotoCmd, false),
 		tcell.KeyCtrlC:     ui.NewKeyAction("Quit", a.quitCmd, false),
+		tcell.KeyCtrlN:     ui.NewSharedKeyAction("z9sTop", a.z9sTopCmd, false),
 	}))
 }
 
@@ -646,6 +673,60 @@ func (a *App) toggleHeaderCmd(evt *tcell.EventKey) *tcell.EventKey {
 	})
 
 	return nil
+}
+
+// z9sTopCmd toggles between the current view and the ktop-inspired dashboard.
+//
+// It saves the active page into an in-memory buffer (a.splashReturn) before
+// showing the dashboard, and restores that exact page on the second press. The
+// underlying view state (resource, selection, namespace) is preserved because
+// tview keeps hidden pages mounted; we only swap which one is visible and
+// start/stop the dashboard's refresh loop accordingly.
+func (a *App) z9sTopCmd(evt *tcell.EventKey) *tcell.EventKey {
+	// Don't toggle while the user is typing a command (e.g. ":ctx").
+	if a.Prompt().InCmdMode() {
+		return evt
+	}
+
+	a.QueueUpdateDraw(func() {
+		name, _ := a.Main.GetFrontPage()
+		if name == z9sTopPageID {
+			target := a.splashReturn
+			if target == "" || !a.Main.HasPage(target) {
+				target = mainPageID
+			}
+			if a.top != nil {
+				a.top.Stop()
+			}
+			a.Main.SwitchToPage(target)
+			a.splashReturn = ""
+			slog.Debug("[TOGGLE] Restored page from z9sTop", "page", target)
+			return
+		}
+
+		a.showZ9sTop()
+		slog.Debug("[TOGGLE] Showing z9sTop; saved page", "page", name)
+	})
+
+	return nil
+}
+
+// showZ9sTop brings the metrics dashboard to the front, remembering the page
+// that was active so we can return to it later. No-op if it's already showing.
+func (a *App) showZ9sTop() {
+	name, _ := a.Main.GetFrontPage()
+	if name == z9sTopPageID {
+		return
+	}
+	a.splashReturn = name
+	if a.top == nil {
+		a.top = NewZ9sTop(a)
+	}
+	if !a.Main.HasPage(z9sTopPageID) {
+		a.Main.AddPage(z9sTopPageID, a.top, true, false)
+	}
+	a.Main.SwitchToPage(z9sTopPageID)
+	a.top.Start()
 }
 
 func (a *App) toggleCrumbsCmd(evt *tcell.EventKey) *tcell.EventKey {

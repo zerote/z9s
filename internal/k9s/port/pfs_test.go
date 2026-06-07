@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/port"
+	"github.com/yourusername/z9s/internal/k9s/port"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/intstr"

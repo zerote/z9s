@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/model"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/model"
 	"github.com/derailed/tview"
 	runewidth "github.com/mattn/go-runewidth"
 )

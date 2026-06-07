@@ -10,11 +10,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/render"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )

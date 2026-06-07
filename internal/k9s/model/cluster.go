@@ -8,8 +8,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/dao"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/dao"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/cache"
 	mv1beta1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"

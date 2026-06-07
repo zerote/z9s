@@ -6,7 +6,7 @@ package ui
 import (
 	"context"
 
-	"github.com/yourusername/z9s/internal/model"
+	"github.com/yourusername/z9s/internal/k9s/model"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 )

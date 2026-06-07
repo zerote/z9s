@@ -7,11 +7,11 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/model"
-	"github.com/yourusername/z9s/internal/slogs"
-	"github.com/yourusername/z9s/internal/ui"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/model"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/yourusername/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 )
 

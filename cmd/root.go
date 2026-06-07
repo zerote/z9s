@@ -1,35 +1,43 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright Authors of z9s
+// Copyright Authors of K9s
 
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"runtime/debug"
+	"strings"
+	"time"
 
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/color"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/config/data"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/yourusername/z9s/internal/k9s/view"
+	"github.com/lmittmann/tint"
+	"github.com/mattn/go-colorable"
 	"github.com/spf13/cobra"
-	"github.com/yourusername/z9s/internal/app"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/client-go/tools/clientcmd/api"
 )
 
 const (
-	appName      = "z9s"
-	shortAppDesc = "Unified Kubernetes CLI combining k9s and ktop"
-	longAppDesc  = `z9s is a unified CLI tool that merges the power of k9s (cluster management)
-and ktop (metrics visualization) into a single seamless experience.
-
-Press Ctrl+F10 to toggle between k9s and ktop modes.`
+	appName      = config.AppName
+	shortAppDesc = "A graphical CLI for your Kubernetes cluster management."
+	longAppDesc  = "K9s is a CLI to view and manage your Kubernetes clusters."
 )
 
-var (
-	// Version information (set at build time)
-	version, commit, date = "dev", "dev", "dev"
+var _ data.KubeSettings = (*client.Config)(nil)
 
-	// CLI flags
-	k9sFlags *k9sCliFlags
-	ktopFlags *ktopCliFlags
-	k8sFlags *genericclioptions.ConfigFlags
+var (
+	version, commit, date = "v0.53.21", "dev", client.NA
+	k9sFlags              *config.Flags
+	k8sFlags              *genericclioptions.ConfigFlags
 
 	rootCmd = &cobra.Command{
 		Use:   appName,
@@ -37,209 +45,398 @@ var (
 		Long:  longAppDesc,
 		RunE:  run,
 	}
+
+	out = colorable.NewColorableStdout()
 )
 
-// k9sCliFlags holds k9s-specific flags
-type k9sCliFlags struct {
-	RefreshRate *float32
-	LogFile     *string
-	LogLevel    *string
-}
+type flagError struct{ err error }
 
-// ktopCliFlags holds ktop-specific flags
-type ktopCliFlags struct {
-	Namespace     *string
-	AllNamespaces *bool
-	Context       *string
-	MetricsSource *string
+func (e flagError) Error() string { return e.err.Error() }
+
+// defaultZ9sLocs points the k9s config/log locations at a ".z9s" directory next
+// to the binary (inside the workspace) when the user hasn't set them explicitly.
+// k9s reads K9S_CONFIG_DIR for config/state and K9S_LOGS_DIR for logs.
+func defaultZ9sLocs() {
+	exe, err := os.Executable()
+	if err != nil {
+		return
+	}
+	base := filepath.Join(filepath.Dir(exe), ".z9s")
+
+	if os.Getenv(config.K9sEnvConfigDir) == "" {
+		_ = os.Setenv(config.K9sEnvConfigDir, base)
+	}
+	if os.Getenv(config.K9sEnvLogsDir) == "" {
+		_ = os.Setenv(config.K9sEnvLogsDir, filepath.Join(base, "logs"))
+	}
 }
 
 func init() {
-	// Initialize K8s flags
-	k8sFlags = genericclioptions.NewConfigFlags(false)
+	// Keep all z9s artifacts (config, per-context state, skins, logs) inside the
+	// workspace next to the binary instead of the OS config dir (~/Library on
+	// macOS). Honors pre-existing env vars so the user can still override.
+	defaultZ9sLocs()
 
-	// Initialize k9s flags
-	k9sFlags = &k9sCliFlags{
-		RefreshRate: new(float32),
-		LogFile:     new(string),
-		LogLevel:    new(string),
+	if err := config.InitLogLoc(); err != nil {
+		fmt.Printf("Fail to init k9s logs location %s\n", err)
 	}
-	*k9sFlags.RefreshRate = 2.0
-	*k9sFlags.LogLevel = "info"
 
-	// Initialize ktop flags
-	ktopFlags = &ktopCliFlags{
-		Namespace:     new(string),
-		AllNamespaces: new(bool),
-		Context:       new(string),
-		MetricsSource: new(string),
-	}
-	*ktopFlags.MetricsSource = "prometheus"
+	rootCmd.SetFlagErrorFunc(func(_ *cobra.Command, err error) error {
+		return flagError{err: err}
+	})
 
-	// Add flags to root command
+	rootCmd.AddCommand(versionCmd(), infoCmd())
 	initK9sFlags()
-	initKtopFlags()
-	k8sFlags.AddFlags(rootCmd.Flags())
-
-	// Add version command
-	rootCmd.AddCommand(versionCmd())
+	initK8sFlags()
 }
 
-// Execute runs the root command
+// Execute root command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		if !errors.As(err, &flagError{}) {
+			panic(err)
+		}
 	}
 }
 
-// run is the main entry point
 func run(*cobra.Command, []string) error {
-	logger := initializeLogger(*k9sFlags.LogLevel)
-
-	logger.Info("🚀 z9s starting up...",
-		"version", version,
-		"commit", commit,
-		"mode", app.GetModeName(app.ModeK9s),
+	if err := config.InitLocs(); err != nil {
+		return err
+	}
+	logFile, err := os.OpenFile(
+		*k9sFlags.LogFile,
+		os.O_CREATE|os.O_APPEND|os.O_WRONLY,
+		data.DefaultFileMod,
 	)
-
-	// Print welcome message
-	fmt.Println(`
-╔════════════════════════════════════════════════════════════╗
-║                     z9s - v0.0.1                          ║
-║         Unified Kubernetes CLI (k9s + ktop)              ║
-╠════════════════════════════════════════════════════════════╣
-║                                                            ║
-║  Keybindings:                                              ║
-║    Ctrl+F10  - Toggle between k9s and ktop modes         ║
-║    q         - Quit application                           ║
-║    Ctrl+C    - Force quit                                 ║
-║                                                            ║
-╚════════════════════════════════════════════════════════════╝
-`)
-
-	// Initialize K8s client
-	logger.Info("Initializing Kubernetes client...")
-	k8sClient := app.GetSharedK8sClient(logger)
-	
-	kubeconfig := k8sFlags.KubeConfig
-	if kubeconfig == nil {
-		kubeconfig = new(string)
-	}
-	
-	if err := k8sClient.Initialize(*kubeconfig); err != nil {
-		logger.Error("Failed to initialize K8s client", "error", err)
-		// Continue anyway - might be offline mode
-	}
-
-	// Create Z9s mode
-	logger.Info("Creating z9s mode...")
-	z9sMode := app.NewZ9sMode(k8sClient, logger)
-
-	// Create ktop mode (stub for now)
-	logger.Info("Creating ktop mode...")
-	ktopMode := app.NewKtopMode(nil, logger) // TODO: implement ktop
-
-	// Create mode context
-	modeCtx := &app.ModeContext{
-		CurrentMode: app.ModeK9s,
-		RefreshRate: *k9sFlags.RefreshRate,
-	}
-
-	// Create app manager
-	logger.Info("Creating app manager...")
-	appManager, err := app.NewAppManager(z9sMode, ktopMode, modeCtx, logger)
 	if err != nil {
-		logger.Error("Failed to create app manager", "error", err)
-		return fmt.Errorf("failed to create app manager: %w", err)
+		return fmt.Errorf("log file %q init failed: %w", *k9sFlags.LogFile, err)
+	}
+	defer func() {
+		if logFile != nil {
+			_ = logFile.Close()
+		}
+	}()
+	defer func() {
+		if err := recover(); err != nil {
+			slog.Error("Boom!! k9s init failed", slogs.Error, err)
+			slog.Error("", slogs.Stack, string(debug.Stack()))
+			printLogo(color.Red)
+			fmt.Printf("%s", color.Colorize("Boom!! ", color.Red))
+			fmt.Printf("%v.\n", err)
+		}
+	}()
+
+	slog.SetDefault(slog.New(tint.NewHandler(logFile, &tint.Options{
+		Level:      parseLevel(*k9sFlags.LogLevel),
+		TimeFormat: time.RFC3339,
+	})))
+
+	cfg, err := loadConfiguration()
+	if err != nil {
+		slog.Warn("Fail to load global/context configuration", slogs.Error, err)
+	}
+	app := view.NewApp(cfg)
+	if app.Config.K9s.DefaultView != "" {
+		app.Config.SetActiveView(app.Config.K9s.DefaultView)
 	}
 
-	// Initialize app manager
-	if err := appManager.Init(); err != nil {
-		logger.Error("Failed to initialize app manager", "error", err)
-		return fmt.Errorf("failed to initialize app manager: %w", err)
+	if err := app.Init(version, int(*k9sFlags.RefreshRate)); err != nil {
+		return err
+	}
+	if err := app.Run(); err != nil {
+		return err
+	}
+	if view.ExitStatus != "" {
+		return fmt.Errorf("view exit status %s", view.ExitStatus)
 	}
 
-	// Run the application
-	logger.Info("Starting main application loop...")
-	return appManager.Run()
+	return nil
 }
 
-// initializeLogger sets up the logger
-func initializeLogger(level string) *slog.Logger {
-	var logLevel slog.Level
+func loadConfiguration() (*config.Config, error) {
+	slog.Info("🐶 K9s starting up...")
+
+	k8sCfg := client.NewConfig(k8sFlags)
+	k9sCfg := config.NewConfig(k8sCfg)
+	var errs error
+
+	conn, err := client.InitConnection(k8sCfg, slog.Default())
+	if err != nil {
+		errs = errors.Join(errs, err)
+	}
+	k9sCfg.SetConnection(conn)
+
+	if err := k9sCfg.Load(config.AppConfigFile, false); err != nil {
+		errs = errors.Join(errs, err)
+	}
+	k9sCfg.K9s.Override(k9sFlags)
+	if err := k9sCfg.Refine(k8sFlags, k9sFlags, k8sCfg); err != nil {
+		slog.Error("Fail to refine k9s config", slogs.Error, err)
+		errs = errors.Join(errs, err)
+	}
+
+	// Try to access server version if that fail. Connectivity issue?
+	if !conn.CheckConnectivity() {
+		errs = errors.Join(errs, fmt.Errorf("cannot connect to context: %s", k9sCfg.K9s.ActiveContextName()))
+	}
+	if !conn.ConnectionOK() {
+		slog.Warn("💣 Kubernetes connectivity toast!")
+		errs = errors.Join(errs, fmt.Errorf("k8s connection failed for context: %s", k9sCfg.K9s.ActiveContextName()))
+	} else {
+		slog.Info("✅ Kubernetes connectivity OK")
+	}
+
+	if err := k9sCfg.Save(false); err != nil {
+		slog.Error("K9s config save failed", slogs.Error, err)
+		errs = errors.Join(errs, err)
+	}
+
+	return k9sCfg, errs
+}
+
+func parseLevel(level string) slog.Level {
 	switch level {
 	case "debug":
-		logLevel = slog.LevelDebug
+		return slog.LevelDebug
 	case "warn":
-		logLevel = slog.LevelWarn
+		return slog.LevelWarn
 	case "error":
-		logLevel = slog.LevelError
+		return slog.LevelError
 	default:
-		logLevel = slog.LevelInfo
+		return slog.LevelInfo
 	}
-
-	return slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-		Level: logLevel,
-	}))
 }
 
-// initK9sFlags registers k9s-specific flags
 func initK9sFlags() {
+	k9sFlags = config.NewFlags()
 	rootCmd.Flags().Float32VarP(
 		k9sFlags.RefreshRate,
 		"refresh", "r",
-		2.0,
+		config.DefaultRefreshRate,
 		"Specify the default refresh rate as a float (sec)",
 	)
-	rootCmd.Flags().StringVar(
-		k9sFlags.LogFile,
-		"logFile",
-		"",
-		"Log file location (leave empty to disable file logging)",
-	)
-	rootCmd.Flags().StringVar(
-		k9sFlags.LogLevel,
-		"log-level",
-		"info",
-		"Log level: debug, info, warn, error",
-	)
-}
-
-// initKtopFlags registers ktop-specific flags
-func initKtopFlags() {
 	rootCmd.Flags().StringVarP(
-		ktopFlags.Namespace,
-		"namespace", "n",
-		"default",
-		"Kubernetes namespace",
+		k9sFlags.LogLevel,
+		"logLevel", "l",
+		config.DefaultLogLevel,
+		"Specify a log level (error, warn, info, debug)",
+	)
+	rootCmd.Flags().StringVarP(
+		k9sFlags.LogFile,
+		"logFile", "",
+		config.AppLogFile,
+		"Specify the log file",
+	)
+	rootCmd.Flags().BoolVar(
+		k9sFlags.Headless,
+		"headless",
+		false,
+		"Turn K9s header off",
+	)
+	rootCmd.Flags().BoolVar(
+		k9sFlags.Logoless,
+		"logoless",
+		false,
+		"Turn K9s logo off",
+	)
+	rootCmd.Flags().BoolVar(
+		k9sFlags.Crumbsless,
+		"crumbsless",
+		false,
+		"Turn K9s crumbs off",
+	)
+	rootCmd.Flags().BoolVar(
+		k9sFlags.Splashless,
+		"splashless",
+		false,
+		"Turn K9s splash screen off",
 	)
 	rootCmd.Flags().BoolVarP(
-		ktopFlags.AllNamespaces,
+		k9sFlags.AllNamespaces,
 		"all-namespaces", "A",
 		false,
-		"Show metrics for all namespaces",
+		"Launch K9s in all namespaces",
+	)
+	rootCmd.Flags().StringVarP(
+		k9sFlags.Command,
+		"command", "c",
+		config.DefaultCommand,
+		"Overrides the default resource to load when the application launches",
+	)
+	rootCmd.Flags().BoolVar(
+		k9sFlags.ReadOnly,
+		"readonly",
+		false,
+		"Sets readOnly mode by overriding readOnly configuration setting",
+	)
+	rootCmd.Flags().BoolVar(
+		k9sFlags.Write,
+		"write",
+		false,
+		"Sets write mode by overriding the readOnly configuration setting",
 	)
 	rootCmd.Flags().StringVar(
-		ktopFlags.Context,
+		k9sFlags.ScreenDumpDir,
+		"screen-dump-dir",
+		"",
+		"Sets a path to a dir for a screen dumps",
+	)
+	rootCmd.Flags()
+}
+
+func initK8sFlags() {
+	k8sFlags = genericclioptions.NewConfigFlags(client.UsePersistentConfig)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.KubeConfig,
+		"kubeconfig",
+		"",
+		"Path to the kubeconfig file to use for CLI requests",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.Timeout,
+		"request-timeout",
+		"",
+		"The length of time to wait before giving up on a single server request",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.Context,
 		"context",
 		"",
-		"Kubernetes context to use",
+		"The name of the kubeconfig context to use",
 	)
+
 	rootCmd.Flags().StringVar(
-		ktopFlags.MetricsSource,
-		"metrics-source",
-		"prometheus",
-		"Metrics source: 'prometheus' or 'metrics-server'",
+		k8sFlags.ClusterName,
+		"cluster",
+		"",
+		"The name of the kubeconfig cluster to use",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.AuthInfoName,
+		"user",
+		"",
+		"The name of the kubeconfig user to use",
+	)
+
+	rootCmd.Flags().StringVarP(
+		k8sFlags.Namespace,
+		"namespace",
+		"n",
+		"",
+		"If present, the namespace scope for this CLI request",
+	)
+
+	initAsFlags()
+	initCertFlags()
+	initK8sFlagCompletion()
+}
+
+func initAsFlags() {
+	rootCmd.Flags().StringVar(
+		k8sFlags.Impersonate,
+		"as",
+		"",
+		"Username to impersonate for the operation",
+	)
+
+	rootCmd.Flags().StringArrayVar(
+		k8sFlags.ImpersonateGroup,
+		"as-group",
+		[]string{},
+		"Group to impersonate for the operation",
 	)
 }
 
-// versionCmd returns the version command
-func versionCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "version",
-		Short: "Print version information",
-		Run: func(_ *cobra.Command, _ []string) {
-			fmt.Printf("%s version %s (commit: %s, date: %s)\n", appName, version, commit, date)
-		},
+func initCertFlags() {
+	rootCmd.Flags().BoolVar(
+		k8sFlags.Insecure,
+		"insecure-skip-tls-verify",
+		false,
+		"If true, the server's caCertFile will not be checked for validity",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.CAFile,
+		"certificate-authority",
+		"",
+		"Path to a cert file for the certificate authority",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.KeyFile,
+		"client-key",
+		"",
+		"Path to a client key file for TLS",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.CertFile,
+		"client-certificate",
+		"",
+		"Path to a client certificate file for TLS",
+	)
+
+	rootCmd.Flags().StringVar(
+		k8sFlags.BearerToken,
+		"token",
+		"",
+		"Bearer token for authentication to the API server",
+	)
+}
+
+type (
+	k8sPickerFn[T any] func(cfg *api.Config) map[string]T
+	completeFn         func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)
+)
+
+func initK8sFlagCompletion() {
+	_ = rootCmd.RegisterFlagCompletionFunc("context", k8sFlagCompletion(func(cfg *api.Config) map[string]*api.Context {
+		return cfg.Contexts
+	}))
+
+	_ = rootCmd.RegisterFlagCompletionFunc("cluster", k8sFlagCompletion(func(cfg *api.Config) map[string]*api.Cluster {
+		return cfg.Clusters
+	}))
+
+	_ = rootCmd.RegisterFlagCompletionFunc("user", k8sFlagCompletion(func(cfg *api.Config) map[string]*api.AuthInfo {
+		return cfg.AuthInfos
+	}))
+
+	_ = rootCmd.RegisterFlagCompletionFunc("namespace", func(_ *cobra.Command, _ []string, s string) ([]string, cobra.ShellCompDirective) {
+		conn := client.NewConfig(k8sFlags)
+		if c, err := client.InitConnection(conn, slog.Default()); err == nil {
+			if nss, err := c.ValidNamespaceNames(); err == nil {
+				return filterFlagCompletions(nss, s)
+			}
+		}
+
+		return nil, cobra.ShellCompDirectiveError
+	})
+}
+
+func k8sFlagCompletion[T any](picker k8sPickerFn[T]) completeFn {
+	return func(_ *cobra.Command, _ []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		conn := client.NewConfig(k8sFlags)
+		cfg, err := conn.RawConfig()
+		if err != nil {
+			slog.Error("K8s raw config getter failed", slogs.Error, err)
+		}
+
+		return filterFlagCompletions(picker(&cfg), toComplete)
 	}
+}
+
+func filterFlagCompletions[T any](m map[string]T, s string) ([]string, cobra.ShellCompDirective) {
+	cc := make([]string, 0, len(m))
+	for name := range m {
+		if strings.HasPrefix(name, s) {
+			cc = append(cc, name)
+		}
+	}
+
+	return cc, cobra.ShellCompDirectiveNoFileComp
 }

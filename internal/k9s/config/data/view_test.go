@@ -6,7 +6,7 @@ package data_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/config/data"
+	"github.com/yourusername/z9s/internal/k9s/config/data"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -8,8 +8,8 @@ import (
 	"log/slog"
 	"regexp"
 
-	"github.com/yourusername/z9s/internal/model1"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/model1"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	"github.com/derailed/tview"
 	"k8s.io/kubectl/pkg/cmd/get"
 )

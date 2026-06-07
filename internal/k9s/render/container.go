@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/model1"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/model1"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 	v1 "k8s.io/api/core/v1"

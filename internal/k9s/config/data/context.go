@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/client"
+	"github.com/yourusername/z9s/internal/k9s/client"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 

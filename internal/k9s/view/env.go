@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 )
 
 // Env represent K9s and K8s available environment variables.

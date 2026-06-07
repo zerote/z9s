@@ -1,0 +1,16 @@
+# Compiled binaries
+/z9s
+/z9s-linux-amd64
+/z9s-darwin-amd64
+/z9s-darwin-arm64
+/z9s-windows-amd64.exe
+
+# Local app state / scratch files
+/.z9s/
+/.resume.md
+
+# ktop reference (dropped: z9s is a single fork of k9s, not a double fork)
+/_reference/
+
+# OS / editor cruft
+.DS_Store

@@ -6,7 +6,7 @@ package dao_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/dao"
+	"github.com/yourusername/z9s/internal/k9s/dao"
 	"github.com/stretchr/testify/assert"
 )
 

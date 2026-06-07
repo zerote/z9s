@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/model"
-	"github.com/yourusername/z9s/internal/render"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/model"
+	"github.com/yourusername/z9s/internal/k9s/render"
 	"github.com/derailed/tview"
 )
 
@@ -47,7 +47,7 @@ func (s *StatusIndicator) StylesChanged(styles *config.Styles) {
 	s.SetTextColor(styles.FgColor())
 }
 
-const statusIndicatorFmt = "[%s::b]K9s [%s::]%s [%s::]%s:%s:%s [%s::]%s[%s::]::[%s::]%s"
+const statusIndicatorFmt = "[%s::b]Z9s [%s::]%s [%s::]%s:%s:%s [%s::]%s[%s::]::[%s::]%s"
 
 // ClusterInfoUpdated notifies the cluster meta was updated.
 func (s *StatusIndicator) ClusterInfoUpdated(data *model.ClusterMeta) {
@@ -56,7 +56,7 @@ func (s *StatusIndicator) ClusterInfoUpdated(data *model.ClusterMeta) {
 			statusIndicatorFmt,
 			s.styles.Body().LogoColor.String(),
 			s.styles.K9s.Info.K9sRevColor.String(),
-			data.K9sVer,
+			data.Z9sVer,
 			s.styles.K9s.Info.FgColor.String(),
 			data.Context,
 			data.Cluster,
@@ -80,7 +80,7 @@ func (s *StatusIndicator) ClusterInfoChanged(prev, cur *model.ClusterMeta) {
 			statusIndicatorFmt,
 			s.styles.Body().LogoColor.String(),
 			s.styles.K9s.Info.K9sRevColor.String(),
-			cur.K9sVer,
+			cur.Z9sVer,
 			s.styles.K9s.Info.FgColor.String(),
 			cur.Context,
 			cur.Cluster,

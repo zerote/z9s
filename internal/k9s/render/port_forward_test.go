@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yourusername/z9s/internal/model1"
-	"github.com/yourusername/z9s/internal/render"
+	"github.com/yourusername/z9s/internal/k9s/model1"
+	"github.com/yourusername/z9s/internal/k9s/render"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

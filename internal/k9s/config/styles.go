@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/yourusername/z9s/internal/config/data"
-	"github.com/yourusername/z9s/internal/config/json"
+	"github.com/yourusername/z9s/internal/k9s/config/data"
+	"github.com/yourusername/z9s/internal/k9s/config/json"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 	"gopkg.in/yaml.v3"
@@ -427,8 +427,8 @@ func newTable() Table {
 	return Table{
 		FgColor:       "aqua",
 		BgColor:       "black",
-		CursorFgColor: "black",
-		CursorBgColor: "aqua",
+		CursorFgColor: "white",
+		CursorBgColor: "dodgerblue",
 		MarkColor:     "palegreen",
 		Header:        newTableHeader(),
 	}

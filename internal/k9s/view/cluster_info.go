@@ -6,13 +6,14 @@ package view
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/model"
-	"github.com/yourusername/z9s/internal/render"
-	"github.com/yourusername/z9s/internal/slogs"
-	"github.com/yourusername/z9s/internal/ui"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/model"
+	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/yourusername/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 )
@@ -25,6 +26,11 @@ type ClusterInfo struct {
 
 	app    *App
 	styles *config.Styles
+
+	// GitOps operator detection is done once (discovery is relatively costly)
+	// and cached for the lifetime of the view.
+	opChecked  bool
+	flux, argo bool
 }
 
 // NewClusterInfo returns a new cluster info view.
@@ -65,7 +71,7 @@ func (c *ClusterInfo) hasMetrics() bool {
 }
 
 func (c *ClusterInfo) layout() {
-	for row, section := range []string{"Context", "Cluster", "User", "K9s Rev", "K8s Rev", "CPU", "MEM"} {
+	for row, section := range []string{"Context", "Cluster", "User", "K8s Rev", "Operator", "CPU", "MEM"} {
 		c.SetCell(row, 0, c.sectionCell(section))
 		c.SetCell(row, 1, c.infoCell(render.NAValue))
 	}
@@ -101,6 +107,54 @@ func (c *ClusterInfo) ClusterInfoUpdated(data *model.ClusterMeta) {
 	c.ClusterInfoChanged(data, data)
 }
 
+// operatorValue returns the GitOps operator line (FluxCD/ArgoCD on|off),
+// detecting their presence once via the cluster's API groups.
+func (c *ClusterInfo) operatorValue() string {
+	if !c.opChecked {
+		c.flux, c.argo = c.detectOperators()
+		c.opChecked = true
+	}
+
+	onOff := func(b bool) string {
+		if b {
+			return "[green::b]on[-:-:-]"
+		}
+		return "[red::b]off[-:-:-]"
+	}
+
+	return fmt.Sprintf("FluxCD: %s  -  ArgoCD: %s", onOff(c.flux), onOff(c.argo))
+}
+
+// detectOperators inspects the cluster's registered API groups to tell whether
+// FluxCD (*.fluxcd.io) and/or ArgoCD (*.argoproj.io) CRDs are installed.
+func (c *ClusterInfo) detectOperators() (flux, argo bool) {
+	conn := c.app.Conn()
+	if conn == nil {
+		return false, false
+	}
+	dial, err := conn.CachedDiscovery()
+	if err != nil {
+		slog.Warn("Operator detection: discovery failed", slogs.Error, err)
+		return false, false
+	}
+	groups, err := dial.ServerGroups()
+	if err != nil || groups == nil {
+		slog.Warn("Operator detection: server groups failed", slogs.Error, err)
+		return false, false
+	}
+	for i := range groups.Groups {
+		name := groups.Groups[i].Name
+		switch {
+		case strings.Contains(name, "fluxcd.io"):
+			flux = true
+		case strings.Contains(name, "argoproj.io"):
+			argo = true
+		}
+	}
+
+	return flux, argo
+}
+
 func (*ClusterInfo) warnCell(s string, w bool) string {
 	if w {
 		return fmt.Sprintf("[orangered::b]%s", s)
@@ -122,12 +176,8 @@ func (c *ClusterInfo) ClusterInfoChanged(prev, curr *model.ClusterMeta) {
 		row := c.setCell(0, context)
 		row = c.setCell(row, curr.Cluster)
 		row = c.setCell(row, curr.User)
-		if curr.K9sLatest != "" {
-			row = c.setCell(row, fmt.Sprintf("%s ⚡️[cadetblue::b]%s", curr.K9sVer, curr.K9sLatest))
-		} else {
-			row = c.setCell(row, curr.K9sVer)
-		}
 		row = c.setCell(row, curr.K8sVer)
+		row = c.setCell(row, c.operatorValue())
 		if c.hasMetrics() {
 			row = c.setCell(row, ui.AsPercDelta(prev.Cpu, curr.Cpu))
 			_ = c.setCell(row, ui.AsPercDelta(prev.Mem, curr.Mem))

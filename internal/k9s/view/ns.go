@@ -4,9 +4,9 @@
 package view
 
 import (
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/model1"
-	"github.com/yourusername/z9s/internal/ui"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/model1"
+	"github.com/yourusername/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 	"k8s.io/apimachinery/pkg/util/sets"
 )

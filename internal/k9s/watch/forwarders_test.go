@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yourusername/z9s/internal/port"
-	"github.com/yourusername/z9s/internal/watch"
+	"github.com/yourusername/z9s/internal/k9s/port"
+	"github.com/yourusername/z9s/internal/k9s/watch"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/tools/portforward"
 )

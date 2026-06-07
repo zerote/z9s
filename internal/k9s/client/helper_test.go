@@ -6,7 +6,7 @@ package client_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/client"
+	"github.com/yourusername/z9s/internal/k9s/client"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

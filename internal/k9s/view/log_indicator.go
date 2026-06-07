@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/yourusername/z9s/internal/config"
+	"github.com/yourusername/z9s/internal/k9s/config"
 	"github.com/derailed/tview"
 )
 

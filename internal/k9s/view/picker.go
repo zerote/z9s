@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/yourusername/z9s/internal/model"
-	"github.com/yourusername/z9s/internal/ui"
-	"github.com/yourusername/z9s/internal/view/cmd"
+	"github.com/yourusername/z9s/internal/k9s/model"
+	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/yourusername/z9s/internal/k9s/view/cmd"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 	"k8s.io/apimachinery/pkg/labels"

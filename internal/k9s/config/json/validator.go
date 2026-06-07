@@ -11,7 +11,7 @@ import (
 	"log/slog"
 	"slices"
 
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v3"
 )

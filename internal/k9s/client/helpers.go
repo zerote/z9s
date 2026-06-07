@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

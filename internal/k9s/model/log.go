@@ -10,12 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yourusername/z9s/internal"
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/color"
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/dao"
-	"github.com/yourusername/z9s/internal/slogs"
+	"github.com/yourusername/z9s/internal/k9s"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/color"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
 )
 
 // LogsListener represents a log model listener.

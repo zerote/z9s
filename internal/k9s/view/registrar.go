@@ -4,7 +4,7 @@
 package view
 
 import (
-	"github.com/yourusername/z9s/internal/client"
+	"github.com/yourusername/z9s/internal/k9s/client"
 )
 
 func loadCustomViewers() MetaViewers {

@@ -1,141 +1,84 @@
-# z9s - K9s + Ktop Unified CLI
+# z9s - K9s con métricas de cluster
 
-> **A unified Kubernetes CLI tool combining the power of k9s (cluster management) and ktop (metrics visualization)**
+> **Un fork de [k9s](https://github.com/derailed/k9s) con modificaciones propias y un dashboard de métricas de cluster extraídas desde Prometheus.**
 
-## 🚀 What is z9s?
+## 🚀 ¿Qué es z9s?
 
-**z9s** merges two powerful Kubernetes CLI tools into one seamless experience:
+**z9s** es un fork de **k9s** que mantiene su look & feel y todas sus capacidades de gestión e inspección de clusters Kubernetes, y le agrega:
 
-- **k9s** 🐶: Full-featured Kubernetes cluster management and inspection
-- **ktop** 📊: Real-time Kubernetes resource metrics and visualization
+- **Dashboard de métricas de cluster** construido de forma nativa sobre el mismo stack TUI de k9s (`derailed/tview` + `derailed/tcell`), sin depender de proyectos externos.
+- **Scraping de métricas desde Prometheus** para series históricas de uso (CPU/MEM y más) además de metrics-server.
+- **Toggle rápido** (`Ctrl+N`) entre la vista actual y el dashboard, preservando el estado de la vista.
 
-## ✨ Key Features
+## ✨ Características
 
-- **Unified Interface**: Single binary for both tools
-- **Mode Toggle**: Press `Ctrl+F10` to instantly switch between k9s and ktop modes
-- **Persistent State**: Your context and selections are preserved when switching modes
-- **Full Compatibility**: All features from both original tools work as expected
-- **Apache 2.0 Licensed**: Open source, free to use and modify
-
-## 🎯 Use Cases
-
-- **DevOps Engineers**: Switch between cluster management and metrics analysis without restarting
-- **Kubernetes Operators**: Quick context switching for different troubleshooting scenarios
-- **SREs**: Unified dashboard for both config and performance monitoring
+- **Todo k9s**: navegación con `:`, contextos, namespaces, recursos, skins y atajos tal cual k9s.
+- **Dashboard z9sTop**: paneles con Cluster Summary, Nodes y Pods, con gauges de CPU/MEM.
+- **Navegación del dashboard**: `Tab` / `Ctrl+flechas` para moverte entre paneles, flechas dentro de cada panel.
+- **Detalle de nodo**: `Enter` sobre un nodo abre una pantalla con su info y los pods que corren en él.
+- **Métricas desde Prometheus**: histórico de uso del cluster además del valor puntual de metrics-server.
+- **Licencia Apache 2.0**.
 
 ## 📋 Quick Start
 
-### Installation
-
 ```bash
-# Clone the repository
+# Clonar el repositorio
 git clone https://github.com/zerote/z9s.git
 cd z9s
 
-# Build from source
-go build -o z9s
+# Build
+./start.sh        # o: go build -o z9s .
 
-# Run
+# Ejecutar
 ./z9s
 ```
 
-### Key Bindings
+### Atajos principales
 
-| Key | Action |
-|-----|--------|
-| `Ctrl+F10` | Toggle between k9s and ktop modes |
-| `q` | Quit application |
-| `Ctrl+C` | Force quit |
+| Tecla | Acción |
+|-------|--------|
+| `Ctrl+N` | Toggle entre la vista actual y el dashboard de métricas (z9sTop) |
+| `Tab` / `Ctrl+↑↓←→` | Moverse entre paneles del dashboard |
+| `Enter` (sobre un nodo) | Abrir el detalle del nodo |
+| `ESC` | Volver desde el detalle |
+| `:` | Comandos de k9s (contextos, recursos, etc.) |
+| `Ctrl+C` | Salir |
 
-## 🏗️ Project Structure
+## 🔧 Desarrollo
 
-```
-z9s/
-├── cmd/                 # Command line interface
-├── internal/
-│   ├── app/            # Application core (modes, toggle logic)
-│   ├── k9s/            # K9s mode implementation
-│   ├── ktop/           # Ktop mode implementation
-│   └── shared/         # Shared code (K8s client, etc.)
-├── docs/               # Documentation
-└── main.go             # Entry point
-```
+### Requisitos
 
-## 🔧 Development
+- Go 1.24 o superior
+- `kubectl` configurado
+- Acceso a un cluster Kubernetes (con metrics-server y/o Prometheus para métricas)
 
-### Prerequisites
-
-- Go 1.25 or higher
-- kubectl configured
-- Access to a Kubernetes cluster
-
-### Building
+### Build
 
 ```bash
-# Simple build
-go build
+# Build simple (toma la versión del código)
+go build -o z9s .
 
-# With version info
-go build -ldflags="-X main.version=v1.0.0"
+# Con info de versión vía ldflags
+make build        # usa VERSION del Makefile
 ```
 
-### Running Tests
+### Tests
 
 ```bash
 go test ./...
 ```
 
-## 📚 Documentation
+## 📝 Licencia
 
-- **Architecture**: See `INTEGRATION_GUIDE.md` or `KT9S_ANALYSIS.md`
-- **Contributing**: See `CONTRIBUTING.md` (coming soon)
-- **Original Projects**:
-  - [k9s](https://github.com/derailed/k9s)
-  - [ktop](https://github.com/vladimirvivien/ktop)
+Este proyecto está licenciado bajo **Apache License 2.0** — ver el archivo [LICENSE](LICENSE).
 
-## 🤝 Contributing
+**Atribución**: z9s es un fork basado en el excelente trabajo de [k9s](https://github.com/derailed/k9s) de Fernand Galiana (@derailed).
 
-This is a community-driven project. Contributions are welcome!
+## 📞 Contacto
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
-
-**Attribution**: This project builds upon the excellent work of:
-- [K9s](https://github.com/derailed/k9s) by Fernand Galiana (@derailed)
-- [Ktop](https://github.com/vladimirvivien/ktop) by Vladimir Vivien (@vladimirvivien)
-
-## 🐛 Issues & Support
-
-Found a bug? Have a feature request?
-
-- [Report an Issue](https://github.com/zerote/z9s/issues)
-- [Start a Discussion](https://github.com/zerote/z9s/discussions)
-
-## 🎓 Roadmap
-
-- [ ] Merge k9s and ktop codebases
-- [ ] Implement mode toggle (Ctrl+F10)
-- [ ] Test both modes thoroughly
-- [ ] Add configuration for default mode
-- [ ] Add combined help page
-- [ ] Performance optimization
-- [ ] Advanced metrics overlays
-- [ ] Plugin system compatibility
-
-## 📞 Contact
-
-- **Author**: @zerote (@zerote)
+- **Autor**: @zerote
 - **Email**: condezero@gmail.com
 
 ---
 
-**Note**: This is an active development project. Features and APIs may change before v1.0 release.
-
-Last Updated: June 6, 2026
+**Nota**: Proyecto en desarrollo activo. Las features y APIs pueden cambiar antes de la v1.0.

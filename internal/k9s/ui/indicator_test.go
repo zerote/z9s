@@ -6,9 +6,9 @@ package ui_test
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/config"
-	"github.com/yourusername/z9s/internal/config/mock"
-	"github.com/yourusername/z9s/internal/ui"
+	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/yourusername/z9s/internal/k9s/config/mock"
+	"github.com/yourusername/z9s/internal/k9s/ui"
 	"github.com/stretchr/testify/assert"
 )
 

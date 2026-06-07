@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/z9s/internal/client"
-	"github.com/yourusername/z9s/internal/slogs"
-	"github.com/yourusername/z9s/internal/vul"
+	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/yourusername/z9s/internal/k9s/vul"
 	"github.com/derailed/tview"
 	"github.com/mattn/go-runewidth"
 	"golang.org/x/text/language"
