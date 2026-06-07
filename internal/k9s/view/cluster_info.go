@@ -128,7 +128,12 @@ func (c *ClusterInfo) operatorValue() string {
 // detectOperators inspects the cluster's registered API groups to tell whether
 // FluxCD (*.fluxcd.io) and/or ArgoCD (*.argoproj.io) CRDs are installed.
 func (c *ClusterInfo) detectOperators() (flux, argo bool) {
-	conn := c.app.Conn()
+	return detectOperators(c.app.Conn())
+}
+
+// detectOperators inspects the cluster's registered API groups to tell whether
+// FluxCD (*.fluxcd.io) and/or ArgoCD (*.argoproj.io) CRDs are installed.
+func detectOperators(conn client.Connection) (flux, argo bool) {
 	if conn == nil {
 		return false, false
 	}

@@ -15,6 +15,9 @@ import (
 // BOZO!! Break up deps and merge into single registrar.
 var Registry = map[*client.GVR]ResourceMeta{
 	// Custom...
+	client.NewGVR("kustomize.toolkit.fluxcd.io/v1/kustomizations"): {
+		Renderer: new(render.Kustomization),
+	},
 	client.WkGVR: {
 		DAO:      new(dao.Workload),
 		Renderer: new(render.Workload),

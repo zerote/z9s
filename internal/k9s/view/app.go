@@ -289,6 +289,7 @@ func (a *App) bindKeys() {
 		tcell.KeyEnter:     ui.NewKeyAction("Goto", a.gotoCmd, false),
 		tcell.KeyCtrlC:     ui.NewKeyAction("Quit", a.quitCmd, false),
 		tcell.KeyCtrlN:     ui.NewSharedKeyAction("z9sTop", a.z9sTopCmd, false),
+		tcell.KeyCtrlO:     ui.NewSharedKeyAction("Operators", a.operatorsCmd, false),
 	}))
 }
 

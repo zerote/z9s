@@ -248,7 +248,11 @@ func (*Help) showGeneral() model.MenuHints {
 		},
 		{
 			Mnemonic:    "Ctrl-n",
-			Description: "Metrics Dashboard",
+			Description: "Toggle between dashboards",
+		},
+		{
+			Mnemonic:    "Ctrl-o",
+			Description: "Operators (FluxCD/ArgoCD)",
 		},
 		{
 			Mnemonic:    "/term",
