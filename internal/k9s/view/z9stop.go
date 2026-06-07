@@ -492,8 +492,17 @@ func (t *Z9sTop) renderSummary() {
 	// Tag helpers. Labels use the accent color; values are white. Pipes line up
 	// across rows thanks to fixed-width fields.
 	const bw = 22 // bar width
+	const uw = 21 // fixed width for the "use" value so the "req" block aligns
 	lbl := func(s string) string { return "[" + sec + "::b]" + s + "[-:-:-]" }
 	white := func(s string) string { return "[white::]" + s + "[-:-:-]" }
+	// valW renders a white value padded to a fixed visible width.
+	valW := func(s string, width int) string {
+		out := white(s)
+		if pad := width - len(s); pad > 0 {
+			out += strings.Repeat(" ", pad)
+		}
+		return out
+	}
 	colw := func(c, s string) string { return "[" + c + "::]" + s + "[-:-:-]" }
 	pipe := "[" + sec + "::b]│[-:-:-] "
 	bar := func(perc int) string {
@@ -550,11 +559,11 @@ func (t *Z9sTop) renderSummary() {
 	// Block 3: cluster CPU/MEM, live usage and requested with delimited bars.
 	_, _ = fmt.Fprintln(t.summary, " "+
 		lbl("CPU  ")+
-		lbl("use ")+bar(client.ToPercentage(useCPU, allCPU))+white(fmt.Sprintf(" %dm/%dm", useCPU, allCPU))+"     "+
+		lbl("use ")+bar(client.ToPercentage(useCPU, allCPU))+valW(fmt.Sprintf(" %dm/%dm", useCPU, allCPU), uw)+
 		lbl("req ")+bar(client.ToPercentage(reqCPU, allCPU))+white(fmt.Sprintf(" %dm/%dm", reqCPU, allCPU)))
 	_, _ = fmt.Fprint(t.summary, " "+
 		lbl("MEM  ")+
-		lbl("use ")+bar(client.ToPercentage(useMEM, allMEM))+white(fmt.Sprintf(" %s/%s", fmtMB(useMEM), fmtMB(allMEM)))+"     "+
+		lbl("use ")+bar(client.ToPercentage(useMEM, allMEM))+valW(fmt.Sprintf(" %s/%s", fmtMB(useMEM), fmtMB(allMEM)), uw)+
 		lbl("req ")+bar(client.ToPercentage(reqMEM, allMEM))+white(fmt.Sprintf(" %s/%s", fmtMB(reqMEM), fmtMB(allMEM))))
 }
 

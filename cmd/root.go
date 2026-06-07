@@ -35,7 +35,7 @@ const (
 var _ data.KubeSettings = (*client.Config)(nil)
 
 var (
-	version, commit, date = "v0.53.21", "dev", client.NA
+	version, commit, date = "v0.53.22", "dev", client.NA
 	k9sFlags              *config.Flags
 	k8sFlags              *genericclioptions.ConfigFlags
 
