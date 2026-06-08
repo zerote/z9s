@@ -1,65 +1,103 @@
-# z9s - K9s con métricas de cluster
+# z9s - K9s with cluster metrics & GitOps
 
-> **Un fork de [k9s](https://github.com/derailed/k9s) con modificaciones propias y un dashboard de métricas de cluster extraídas desde Prometheus.**
+> **A fork of [k9s](https://github.com/derailed/k9s) with custom features: a native cluster metrics dashboard and GitOps operator management (FluxCD).**
 
-## 🚀 ¿Qué es z9s?
+## 🚀 What is z9s?
 
-**z9s** es un fork de **k9s** que mantiene su look & feel y todas sus capacidades de gestión e inspección de clusters Kubernetes, y le agrega:
+**z9s** is a fork of **k9s** that keeps its look & feel and all of its Kubernetes cluster management and inspection capabilities, while adding:
 
-- **Dashboard de métricas de cluster** construido de forma nativa sobre el mismo stack TUI de k9s (`derailed/tview` + `derailed/tcell`), sin depender de proyectos externos.
-- **Scraping de métricas desde Prometheus** para series históricas de uso (CPU/MEM y más) además de metrics-server.
-- **Toggle rápido** (`Ctrl+N`) entre la vista actual y el dashboard, preservando el estado de la vista.
+- **Cluster metrics dashboard** built natively on top of the same TUI stack as k9s (`derailed/tview` + `derailed/tcell`), with no external project dependencies.
+- **Prometheus metrics scraping** for historical usage series (CPU/MEM and more) on top of metrics-server.
+- **GitOps operators**: detection and management of **FluxCD** directly from the TUI, with an **ArgoCD** integration planned (see below).
+- **Fast toggle** (`Ctrl+N`) between the current view and the dashboards, preserving view state.
 
-## ✨ Características
+## ✨ Features
 
-- **Todo k9s**: navegación con `:`, contextos, namespaces, recursos, skins y atajos tal cual k9s.
-- **Dashboard z9sTop**: paneles con Cluster Summary, Nodes y Pods, con gauges de CPU/MEM.
-- **Navegación del dashboard**: `Tab` / `Ctrl+flechas` para moverte entre paneles, flechas dentro de cada panel.
-- **Detalle de nodo**: `Enter` sobre un nodo abre una pantalla con su info y los pods que corren en él.
-- **Métricas desde Prometheus**: histórico de uso del cluster además del valor puntual de metrics-server.
-- **Licencia Apache 2.0**.
+### Core
+- **All of k9s**: navigation with `:`, contexts, namespaces, resources, skins and shortcuts, exactly like k9s.
+- **z9sTop dashboard**: panels for Cluster Summary, Nodes and Pods, with CPU/MEM gauges.
+- **Dashboard navigation**: `Tab` / `Ctrl+arrows` to move between panels, arrow keys within each panel.
+- **Node detail**: pressing `Enter` on a node opens a screen with its info and the pods running on it.
+- **Prometheus metrics**: historical cluster usage in addition to the point-in-time value from metrics-server.
+- **Operator detection**: the cluster header shows the status of `FluxCD` and `ArgoCD` (on/off) at startup.
+
+### GitOps — FluxCD
+- **Operators page** (`Ctrl+O`): landing page listing the GitOps operators detected on the cluster. If only one operator is installed, it jumps straight to its Overview.
+- **FluxCD Overview** (`<o>`): a Lens-like dashboard with:
+  - **Vertical stacked bars** per resource type (Kustomizations, Helm Releases, Git Repositories, Helm Repositories, Helm Charts, OCI Repositories).
+  - Status breakdown per type: **Ready**, **InProgress**, **NotReady**, **Suspended**, **Unknown**.
+  - A **Flux Events** panel with the latest Flux-related Kubernetes events (Type, Message, Namespace, Involved Object, Source, Count, Age, Last Seen), scrollable with the arrow keys.
+- **Kustomization management** (`<k>`): list of Kustomizations with columns **Name, Namespace, Status, Ready Message, Age** and real actions against FluxCD:
+  - **Reconcile** (`<r>`) — force a reconciliation.
+  - **Suspend** (`<s>`) — pause reconciliation (`spec.suspend`).
+  - **Resume** (`<u>`) — resume reconciliation.
+
+### GitOps — ArgoCD (preview / not ready yet)
+> ⚠️ **Work in progress.** z9s already **detects** whether ArgoCD is installed on the cluster (shown in the header and on the Operators page via `<a>`), but the management views (Applications, sync/refresh actions, etc.) are **not implemented yet**. The goal is to offer an experience equivalent to the FluxCD integration: application overview, status breakdown, events, and actions like sync, refresh and rollback.
+
+- **Apache 2.0 license**.
 
 ## 📋 Quick Start
 
 ```bash
-# Clonar el repositorio
+# Install via Homebrew
+brew tap zerote/z9s
+brew install z9s
+
+# Run
+z9s
+```
+
+### Build from source
+
+```bash
 git clone https://github.com/zerote/z9s.git
 cd z9s
-
-# Build
-./start.sh        # o: go build -o z9s .
-
-# Ejecutar
+go build -o z9s .   # or: ./start.sh
 ./z9s
 ```
 
-### Atajos principales
+### Main shortcuts
 
-| Tecla | Acción |
-|-------|--------|
-| `Ctrl+N` | Toggle entre la vista actual y el dashboard de métricas (z9sTop) |
-| `Tab` / `Ctrl+↑↓←→` | Moverse entre paneles del dashboard |
-| `Enter` (sobre un nodo) | Abrir el detalle del nodo |
-| `ESC` | Volver desde el detalle |
-| `:` | Comandos de k9s (contextos, recursos, etc.) |
-| `Ctrl+C` | Salir |
+| Key | Action |
+|-----|--------|
+| `Ctrl+N` | Toggle between the current view and the metrics dashboard (z9sTop) |
+| `Ctrl+O` | Open the GitOps Operators page (FluxCD / ArgoCD) |
+| `Tab` / `Ctrl+↑↓←→` | Move between dashboard panels |
+| `Enter` (on a node) | Open the node detail |
+| `ESC` | Go back from a detail/page |
+| `:` | k9s commands (contexts, resources, etc.) |
+| `:metrics` / `:cluster` | Switch between the metrics and cluster dashboards |
+| `Ctrl+C` | Quit |
 
-## 🔧 Desarrollo
+### FluxCD shortcuts
 
-### Requisitos
+| Key | Context | Action |
+|-----|---------|--------|
+| `<f>` | Operators page | Open the FluxCD section |
+| `<o>` | FluxCD | Overview (status chart + Flux events) |
+| `<k>` | FluxCD | Kustomizations list |
+| `<r>` | Kustomizations | Reconcile the selected resource |
+| `<s>` | Kustomizations | Suspend the selected resource |
+| `<u>` | Kustomizations | Resume the selected resource |
 
-- Go 1.24 o superior
-- `kubectl` configurado
-- Acceso a un cluster Kubernetes (con metrics-server y/o Prometheus para métricas)
+## 🔧 Development
+
+### Requirements
+
+- Go 1.24 or higher
+- `kubectl` configured
+- Access to a Kubernetes cluster (with metrics-server and/or Prometheus for metrics)
+- FluxCD installed on the cluster to use the GitOps features
 
 ### Build
 
 ```bash
-# Build simple (toma la versión del código)
+# Simple build (takes the version from the code)
 go build -o z9s .
 
-# Con info de versión vía ldflags
-make build        # usa VERSION del Makefile
+# With version info via ldflags
+make build        # uses VERSION from the Makefile
 ```
 
 ### Tests
@@ -68,17 +106,17 @@ make build        # usa VERSION del Makefile
 go test ./...
 ```
 
-## 📝 Licencia
+## 📝 License
 
-Este proyecto está licenciado bajo **Apache License 2.0** — ver el archivo [LICENSE](LICENSE).
+This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file.
 
-**Atribución**: z9s es un fork basado en el excelente trabajo de [k9s](https://github.com/derailed/k9s) de Fernand Galiana (@derailed).
+**Attribution**: z9s is a fork based on the excellent work of [k9s](https://github.com/derailed/k9s) by Fernand Galiana (@derailed).
 
-## 📞 Contacto
+## 📞 Contact
 
-- **Autor**: @zerote
+- **Author**: @zerote
 - **Email**: condezero@gmail.com
 
 ---
 
-**Nota**: Proyecto en desarrollo activo. Las features y APIs pueden cambiar antes de la v1.0.
+**Note**: Project under active development. Features and APIs may change before v1.0.
