@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: suspended-demo
+  labels:
+    app: suspended-demo
+spec:
+  # Paused on purpose -> ArgoCD health: Suspended
+  paused: true
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suspended-demo
+  template:
+    metadata:
+      labels:
+        app: suspended-demo
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80

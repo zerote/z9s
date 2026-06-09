@@ -8,7 +8,7 @@ and is crafted to land in a specific health state:
 |----------------|-------------------------|
 | `degraded/`    | **Degraded** (invalid image -> ImagePullBackOff) |
 | `progressing/` | **Progressing** (readiness probe never passes) |
-| `suspended/`   | **Suspended** (CronJob with `suspend: true`) |
+| `suspended/`   | **Suspended** (Deployment with `spec.paused: true`) |
 
 Healthy/Synced and OutOfSync states are sourced from the upstream
 [argocd-example-apps](https://github.com/argoproj/argocd-example-apps) repo.
