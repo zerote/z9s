@@ -18,6 +18,9 @@ var Registry = map[*client.GVR]ResourceMeta{
 	client.NewGVR("kustomize.toolkit.fluxcd.io/v1/kustomizations"): {
 		Renderer: new(render.Kustomization),
 	},
+	client.NewGVR("argoproj.io/v1alpha1/applications"): {
+		Renderer: new(render.ArgoApplication),
+	},
 	client.WkGVR: {
 		DAO:      new(dao.Workload),
 		Renderer: new(render.Workload),
