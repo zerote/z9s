@@ -12,8 +12,8 @@ import (
 const argoApplicationGVR = "argoproj.io/v1alpha1/applications"
 
 // ArgoApplication represents an ArgoCD Application browser. Pressing <enter>
-// drills into the Application's managed resources (its details tree) instead of
-// the default describe view.
+// drills into the Application's managed resources (its details tree), and the
+// ArgoExtender adds GitOps actions (sync, refresh).
 type ArgoApplication struct {
 	ResourceViewer
 }
@@ -21,7 +21,7 @@ type ArgoApplication struct {
 // NewArgoApplication returns a new ArgoCD Application viewer.
 func NewArgoApplication(gvr *client.GVR) ResourceViewer {
 	a := ArgoApplication{
-		ResourceViewer: NewBrowser(gvr),
+		ResourceViewer: NewArgoExtender(NewBrowser(gvr)),
 	}
 	a.GetTable().SetEnterFn(a.showResources)
 
