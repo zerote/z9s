@@ -6,6 +6,8 @@ metadata:
     app: degraded-demo
 spec:
   replicas: 1
+  # Short deadline so the failed image pull flips the app to Degraded quickly.
+  progressDeadlineSeconds: 30
   selector:
     matchLabels:
       app: degraded-demo
