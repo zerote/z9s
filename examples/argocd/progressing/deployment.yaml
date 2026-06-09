@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: progressing-demo
+  labels:
+    app: progressing-demo
+spec:
+  replicas: 1
+  # Huge deadline so the rollout never flips to Degraded; it stays Progressing.
+  progressDeadlineSeconds: 600000000
+  selector:
+    matchLabels:
+      app: progressing-demo
+  template:
+    metadata:
+      labels:
+        app: progressing-demo
+    spec:
+      containers:
+        # Pod runs fine but readiness probe always fails -> never Ready ->
+        # Deployment never completes -> ArgoCD health: Progressing
+        - name: app
+          image: busybox:1.36
+          command: ["sh", "-c", "sleep 100000000"]
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "exit 1"]
+            periodSeconds: 10

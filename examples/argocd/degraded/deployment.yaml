@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: degraded-demo
+  labels:
+    app: degraded-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: degraded-demo
+  template:
+    metadata:
+      labels:
+        app: degraded-demo
+    spec:
+      containers:
+        # Invalid image tag on purpose -> ImagePullBackOff -> ArgoCD health: Degraded
+        - name: app
+          image: nginx:this-tag-does-not-exist-9999
+          ports:
+            - containerPort: 80

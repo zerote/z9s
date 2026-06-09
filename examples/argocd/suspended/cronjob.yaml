@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: suspended-demo
+spec:
+  schedule: "0 0 * * *"
+  # Suspended on purpose -> ArgoCD health: Suspended
+  suspend: true
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: hello
+              image: busybox:1.36
+              command: ["sh", "-c", "echo hello"]
