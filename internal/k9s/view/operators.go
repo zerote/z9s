@@ -160,6 +160,9 @@ func (a *App) operatorsCmd(evt *tcell.EventKey) *tcell.EventKey {
 	if flux && !argo {
 		return a.gotoFlux(evt)
 	}
+	if argo && !flux {
+		return a.gotoArgo(evt)
+	}
 	if err := a.inject(NewOperators(a), false); err != nil {
 		a.Flash().Err(err)
 	}
@@ -176,7 +179,19 @@ func (a *App) gotoFlux(*tcell.EventKey) *tcell.EventKey {
 }
 
 func (a *App) gotoArgo(*tcell.EventKey) *tcell.EventKey {
-	a.Flash().Info("ArgoCD support is coming soon")
+	if err := a.inject(NewArgoOverview(a), false); err != nil {
+		a.Flash().Err(err)
+	}
+
+	return nil
+}
+
+func (a *App) gotoArgoApplications(*tcell.EventKey) *tcell.EventKey {
+	v := NewArgoApplication(client.NewGVR(argoApplicationGVR))
+	v.SetCommand(cmd.NewInterpreter("applications"))
+	if err := a.inject(v, false); err != nil {
+		a.Flash().Err(err)
+	}
 
 	return nil
 }
