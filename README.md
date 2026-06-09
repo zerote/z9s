@@ -1,6 +1,6 @@
 # z9s - K9s with cluster metrics & GitOps
 
-> **A fork of [k9s](https://github.com/derailed/k9s) with custom features: a native cluster metrics dashboard and GitOps operator management (FluxCD).**
+> **A fork of [k9s](https://github.com/derailed/k9s) with custom features: a native cluster metrics dashboard and GitOps operator management (FluxCD & ArgoCD).**
 
 ## 🚀 What is z9s?
 
@@ -8,7 +8,7 @@
 
 - **Cluster metrics dashboard** built natively on top of the same TUI stack as k9s (`derailed/tview` + `derailed/tcell`), with no external project dependencies.
 - **Prometheus metrics scraping** for historical usage series (CPU/MEM and more) on top of metrics-server.
-- **GitOps operators**: detection and management of **FluxCD** directly from the TUI, with an **ArgoCD** integration planned (see below).
+- **GitOps operators**: detection and management of **FluxCD** and **ArgoCD** directly from the TUI.
 - **Fast toggle** (`Ctrl+N`) between the current view and the dashboards, preserving view state.
 
 ## ✨ Features
@@ -19,7 +19,7 @@
 - **Dashboard navigation**: `Tab` / `Ctrl+arrows` to move between panels, arrow keys within each panel.
 - **Node detail**: pressing `Enter` on a node opens a screen with its info and the pods running on it.
 - **Prometheus metrics**: historical cluster usage in addition to the point-in-time value from metrics-server.
-- **Operator detection**: the cluster header shows the status of `FluxCD` and `ArgoCD` (on/off) at startup.
+- **Operator detection**: the cluster header shows the status of `FluxCD` and `ArgoCD` (on/off), re-detected automatically when switching contexts.
 
 ### GitOps — FluxCD
 - **Operators page** (`Ctrl+O`): landing page listing the GitOps operators detected on the cluster. If only one operator is installed, it jumps straight to its Overview.
@@ -32,8 +32,18 @@
   - **Suspend** (`<s>`) — pause reconciliation (`spec.suspend`).
   - **Resume** (`<u>`) — resume reconciliation.
 
-### GitOps — ArgoCD (preview / not ready yet)
-> ⚠️ **Work in progress.** z9s already **detects** whether ArgoCD is installed on the cluster (shown in the header and on the Operators page via `<a>`), but the management views (Applications, sync/refresh actions, etc.) are **not implemented yet**. The goal is to offer an experience equivalent to the FluxCD integration: application overview, status breakdown, events, and actions like sync, refresh and rollback.
+### GitOps — ArgoCD
+- **ArgoCD Overview** (`<a>` from the Operators page): a dashboard with:
+  - **Stacked vertical bars** for Application **Health** (Healthy, Progressing, Degraded, Suspended, Missing, Unknown) and **Sync** (Synced, OutOfSync, Unknown) status.
+  - An **ArgoCD Events** panel with the latest ArgoCD-related Kubernetes events, scrollable with the arrow keys.
+- **Applications browser** (`<a>` from the Overview): list styled after the ArgoCD web UI with columns **Name, Project, Source, Destination, Revision, Sync, Health, Age** and inline colored status icons.
+- **Application resource tree** (`Enter` on an Application): hierarchical view of every resource managed by the Application, resolved live from the cluster via `ownerReferences` (e.g. Application → Deployment → ReplicaSet → Pod), with color-coded statuses.
+  - `Enter` on a node shows the **live YAML manifest**.
+  - `x` on a **Secret** shows its data **base64-decoded**.
+  - `Space` expands/collapses nodes.
+- **Real actions against ArgoCD**:
+  - **Sync** (`<s>`) — trigger a synchronization (same mechanism as `argocd app sync`), with confirmation dialog.
+  - **Refresh** (`<r>`) — force ArgoCD to re-poll git.
 
 - **Apache 2.0 license**.
 
@@ -81,6 +91,20 @@ go build -o z9s .   # or: ./start.sh
 | `<s>` | Kustomizations | Suspend the selected resource |
 | `<u>` | Kustomizations | Resume the selected resource |
 
+### ArgoCD shortcuts
+
+| Key | Context | Action |
+|-----|---------|--------|
+| `<a>` | Operators page | Open the ArgoCD section |
+| `<o>` | ArgoCD | Overview (Health/Sync charts + ArgoCD events) |
+| `<a>` | ArgoCD Overview | Applications list |
+| `Enter` | Applications | Open the Application resource tree |
+| `<s>` | Applications | Sync the selected Application |
+| `<r>` | Applications | Refresh the selected Application |
+| `Enter` | Resource tree | View the live YAML manifest |
+| `x` | Resource tree | Decode a Secret (base64) |
+| `Space` | Resource tree | Expand/collapse node |
+
 ## 🔧 Development
 
 ### Requirements
@@ -88,7 +112,7 @@ go build -o z9s .   # or: ./start.sh
 - Go 1.24 or higher
 - `kubectl` configured
 - Access to a Kubernetes cluster (with metrics-server and/or Prometheus for metrics)
-- FluxCD installed on the cluster to use the GitOps features
+- FluxCD and/or ArgoCD installed on the cluster to use the GitOps features
 
 ### Build
 
