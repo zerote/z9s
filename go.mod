@@ -1,4 +1,4 @@
-module github.com/yourusername/z9s
+module github.com/zerote/z9s
 
 go 1.24.4
 
