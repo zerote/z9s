@@ -53,7 +53,8 @@ z9s
 ```bash
 git clone https://github.com/zerote/z9s.git
 cd z9s
-go build -o z9s .   # or: ./start.sh
+make build   # Recommended - uses ldflags for version info
+# or: go build -o z9s .
 ./z9s
 ```
 
@@ -93,11 +94,14 @@ go build -o z9s .   # or: ./start.sh
 ### Build
 
 ```bash
-# Simple build (takes the version from the code)
+# Recommended - with version info via ldflags
+make build        # uses VERSION from the Makefile
+
+# Simple build (uses hardcoded version from code)
 go build -o z9s .
 
-# With version info via ldflags
-make build        # uses VERSION from the Makefile
+# Note: If you get ldflags errors, the fix is included in this repo
+# The ldflags in older versions pointed to 'main' instead of 'cmd' package
 ```
 
 ### Tests
