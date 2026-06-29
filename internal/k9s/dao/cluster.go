@@ -10,9 +10,9 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/k9s"
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 )
 
 // RefScanner represents a resource reference scanner.

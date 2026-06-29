@@ -6,7 +6,7 @@ package view
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/config"
 	"github.com/stretchr/testify/assert"
 )
 

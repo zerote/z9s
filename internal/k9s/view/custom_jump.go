@@ -11,11 +11,11 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/yourusername/z9s/internal/k9s"
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/dao"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
 )

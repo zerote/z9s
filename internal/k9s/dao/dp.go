@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/render"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/client"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 

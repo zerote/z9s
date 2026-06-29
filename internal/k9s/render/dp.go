@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/model1"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/model1"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 	appsv1 "k8s.io/api/apps/v1"

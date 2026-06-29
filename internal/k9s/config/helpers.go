@@ -9,7 +9,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 )
 
 const (

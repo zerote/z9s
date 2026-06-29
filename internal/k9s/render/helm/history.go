@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/model1"
-	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/model1"
+	"github.com/zerote/z9s/internal/k9s/render"
 )
 
 // History renders a History chart to screen.

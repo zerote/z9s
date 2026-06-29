@@ -10,10 +10,10 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
-	"github.com/yourusername/z9s/internal/k9s/view/cmd"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/view/cmd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/adrg/xdg"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/config/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -7,9 +7,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/dao"
 )
 
 // ClusterInfoListener registers a listener for model changes.

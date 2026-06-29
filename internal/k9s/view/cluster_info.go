@@ -8,12 +8,12 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/model"
-	"github.com/yourusername/z9s/internal/k9s/render"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/model"
+	"github.com/zerote/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 )

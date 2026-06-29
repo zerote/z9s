@@ -16,10 +16,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 	"github.com/rakyll/hey/requester"
 )
 

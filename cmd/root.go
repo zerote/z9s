@@ -13,12 +13,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/color"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
-	"github.com/yourusername/z9s/internal/k9s/view"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/color"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/view"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-colorable"
 	"github.com/spf13/cobra"
@@ -35,7 +35,7 @@ const (
 var _ data.KubeSettings = (*client.Config)(nil)
 
 var (
-	version, commit, date = "v0.55.8", "dev", client.NA
+	version, commit, date = "v0.55.9", "dev", client.NA
 	k9sFlags              *config.Flags
 	k8sFlags              *genericclioptions.ConfigFlags
 

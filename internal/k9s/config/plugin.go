@@ -16,9 +16,9 @@ import (
 	"strings"
 
 	"github.com/adrg/xdg"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
-	"github.com/yourusername/z9s/internal/k9s/config/json"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/config/json"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 	"github.com/karrick/godirwalk"
 	"gopkg.in/yaml.v3"
 )

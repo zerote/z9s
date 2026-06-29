@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/dao"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
 )

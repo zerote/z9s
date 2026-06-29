@@ -7,9 +7,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/dao"
-	"github.com/yourusername/z9s/internal/k9s/watch"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/watch"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

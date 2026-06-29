@@ -4,8 +4,8 @@
 package view
 
 import (
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/ui"
 )
 
 // argoApplicationGVR is the GVR for ArgoCD Application custom resources.

@@ -6,9 +6,9 @@ package view
 import (
 	"errors"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/dao"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"

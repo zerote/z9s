@@ -10,7 +10,7 @@ import (
 
 	"github.com/derailed/tcell/v2"
 	"github.com/derailed/tview"
-	"github.com/yourusername/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/client"
 	v1 "k8s.io/api/core/v1"
 )
 

@@ -7,8 +7,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s"
-	"github.com/yourusername/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s"
+	"github.com/zerote/z9s/internal/k9s/dao"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

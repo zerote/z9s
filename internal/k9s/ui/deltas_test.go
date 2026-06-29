@@ -6,7 +6,7 @@ package ui
 import (
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/render"
 	"github.com/stretchr/testify/assert"
 )
 

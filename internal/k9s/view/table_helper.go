@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
-	"github.com/yourusername/z9s/internal/k9s/model1"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/model1"
+	"github.com/zerote/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/ui"
 )
 
 func computeFilename(dumpPath, ns, title, path string) (string, error) {

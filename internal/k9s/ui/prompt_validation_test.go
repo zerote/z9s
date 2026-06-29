@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/model"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/model"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 	"github.com/stretchr/testify/assert"
 )

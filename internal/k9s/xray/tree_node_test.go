@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/xray"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/xray"
 	"github.com/stretchr/testify/assert"
 )
 

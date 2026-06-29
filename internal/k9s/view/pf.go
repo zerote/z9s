@@ -10,14 +10,14 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/yourusername/z9s/internal/k9s"
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/dao"
-	"github.com/yourusername/z9s/internal/k9s/model"
-	"github.com/yourusername/z9s/internal/k9s/perf"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
-	"github.com/yourusername/z9s/internal/k9s/ui"
-	"github.com/yourusername/z9s/internal/k9s/ui/dialog"
+	"github.com/zerote/z9s/internal/k9s"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/model"
+	"github.com/zerote/z9s/internal/k9s/perf"
+	"github.com/zerote/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/ui/dialog"
 	"github.com/derailed/tcell/v2"
 )
 

@@ -8,9 +8,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/render"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 )
 

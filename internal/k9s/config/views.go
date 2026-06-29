@@ -15,10 +15,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/config/data"
-	"github.com/yourusername/z9s/internal/k9s/config/json"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/config/data"
+	"github.com/zerote/z9s/internal/k9s/config/json"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 	"gopkg.in/yaml.v3"
 )
 

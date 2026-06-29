@@ -4,11 +4,11 @@
 package model
 
 import (
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/dao"
-	"github.com/yourusername/z9s/internal/k9s/render"
-	"github.com/yourusername/z9s/internal/k9s/render/helm"
-	"github.com/yourusername/z9s/internal/k9s/xray"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/dao"
+	"github.com/zerote/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/render/helm"
+	"github.com/zerote/z9s/internal/k9s/xray"
 )
 
 // Registry tracks resources metadata.

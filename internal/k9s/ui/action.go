@@ -8,8 +8,8 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/yourusername/z9s/internal/k9s/model"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/model"
+	"github.com/zerote/z9s/internal/k9s/slogs"
 	"github.com/derailed/tcell/v2"
 )
 

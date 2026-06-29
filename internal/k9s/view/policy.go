@@ -6,9 +6,9 @@ package view
 import (
 	"context"
 
-	"github.com/yourusername/z9s/internal/k9s"
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/derailed/tcell/v2"
 )
 

@@ -8,10 +8,10 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/yourusername/z9s/internal/k9s/color"
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/slogs"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/color"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/slogs"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )

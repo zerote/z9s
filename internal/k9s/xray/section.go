@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/client"
-	"github.com/yourusername/z9s/internal/k9s/render"
+	"github.com/zerote/z9s/internal/k9s/client"
+	"github.com/zerote/z9s/internal/k9s/render"
 )
 
 // Section represents an xray renderer.

@@ -3,7 +3,7 @@
 
 package view
 
-import "github.com/yourusername/z9s/internal/k9s/client"
+import "github.com/zerote/z9s/internal/k9s/client"
 
 // fluxKustomizationGVR is the GVR for Flux Kustomization custom resources.
 const fluxKustomizationGVR = "kustomize.toolkit.fluxcd.io/v1/kustomizations"

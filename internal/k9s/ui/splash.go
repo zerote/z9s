@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yourusername/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/config"
 	"github.com/derailed/tview"
 )
 

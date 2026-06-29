@@ -7,7 +7,7 @@ import (
 	"flag"
 	"os"
 
-	"github.com/yourusername/z9s/cmd"
+	"github.com/zerote/z9s/cmd"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/klog/v2"
 )

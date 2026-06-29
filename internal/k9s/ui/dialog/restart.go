@@ -4,8 +4,8 @@
 package dialog
 
 import (
-	"github.com/yourusername/z9s/internal/k9s/config"
-	"github.com/yourusername/z9s/internal/k9s/ui"
+	"github.com/zerote/z9s/internal/k9s/config"
+	"github.com/zerote/z9s/internal/k9s/ui"
 	"github.com/derailed/tview"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
