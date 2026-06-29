@@ -27,9 +27,10 @@ type ClusterInfo struct {
 	app    *App
 	styles *config.Styles
 
-	// GitOps operator detection is done once (discovery is relatively costly)
-	// and cached for the lifetime of the view.
+	// GitOps operator detection is cached per context (discovery is relatively
+	// costly) and re-run whenever the active context changes.
 	opChecked  bool
+	opContext  string
 	flux, argo bool
 }
 
@@ -108,11 +109,12 @@ func (c *ClusterInfo) ClusterInfoUpdated(data *model.ClusterMeta) {
 }
 
 // operatorValue returns the GitOps operator line (FluxCD/ArgoCD on|off),
-// detecting their presence once via the cluster's API groups.
-func (c *ClusterInfo) operatorValue() string {
-	if !c.opChecked {
+// detecting their presence via the cluster's API groups. The result is cached
+// per context so switching contexts triggers a fresh detection.
+func (c *ClusterInfo) operatorValue(context string) string {
+	if !c.opChecked || c.opContext != context {
 		c.flux, c.argo = c.detectOperators()
-		c.opChecked = true
+		c.opChecked, c.opContext = true, context
 	}
 
 	onOff := func(b bool) string {
@@ -182,7 +184,7 @@ func (c *ClusterInfo) ClusterInfoChanged(prev, curr *model.ClusterMeta) {
 		row = c.setCell(row, curr.Cluster)
 		row = c.setCell(row, curr.User)
 		row = c.setCell(row, curr.K8sVer)
-		row = c.setCell(row, c.operatorValue())
+		row = c.setCell(row, c.operatorValue(curr.Context))
 		if c.hasMetrics() {
 			row = c.setCell(row, ui.AsPercDelta(prev.Cpu, curr.Cpu))
 			_ = c.setCell(row, ui.AsPercDelta(prev.Mem, curr.Mem))

@@ -2,7 +2,7 @@
 
 # Variables
 BINARY_NAME=z9s
-VERSION?=v0.54.15
+VERSION?=v0.55.7
 COMMIT?=$(shell git rev-parse --short HEAD 2>/dev/null || echo "dev")
 DATE?=$(shell date -u '+%Y-%m-%d')
 LDFLAGS=-ldflags "-X github.com/yourusername/z9s/cmd.version=$(VERSION) -X github.com/yourusername/z9s/cmd.commit=$(COMMIT) -X github.com/yourusername/z9s/cmd.date=$(DATE)"
