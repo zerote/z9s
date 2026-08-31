@@ -6,7 +6,7 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache git make
 
-# Copy source
+## Copy source
 COPY . .
 
 # Build
